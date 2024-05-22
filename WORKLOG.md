@@ -11,11 +11,11 @@ info
 info
 
 
-## GROUP MEMBER 2
+## Preston Thomsen
 
-### date x
+### 5/22/2024
 
-info
+Ironed out the distribution of work and got our workspace ready to begin proper coding.
 
 ### date y
 
