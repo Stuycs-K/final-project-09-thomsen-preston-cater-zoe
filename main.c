@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "parser.h" // Recipe, printIngredient, parse
+#include "stack.h"
 
 int main(int argc, char *argv[]) {
     char *filename = argv[1];
