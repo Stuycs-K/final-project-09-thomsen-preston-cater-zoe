@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     //We will have status changes come after the file which is being modified so that it is easier to incorporate new things as we get to it
 
     // Parse file as Recipe
-    struct Recipe recipe = parse(filename); 
+    struct Recipe recipe = parse(filename);
 
     // Print Recipe details for debugging purposes
     printf("%s\n", recipe.title);
