@@ -1,7 +1,7 @@
 .PHONY: run compile clean
 
 run: main
-	./main 'souffle.chef'
+	./main 'recipes/souffle.chef'
 
 compile main: main.o parser.o
 	gcc -Wall -Werror -o main main.o parser.o
