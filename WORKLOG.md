@@ -1,10 +1,11 @@
 # Work Log
 
-## GROUP MEMBER 1
+## Zoe Cater
 
-### date x
+### 2024-05-22
 
-info
+- Added some basic files (makefile, gitignore) and set up workspace.
+- Spent ages implementing first half of recipe parsing (reading titles and ingredient lists).
 
 ### date y
 
