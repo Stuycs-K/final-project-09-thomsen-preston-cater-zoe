@@ -16,7 +16,8 @@ info
 
 ### 5/22/2024
 
-Ironed out the distribution of work and got our workspace ready to begin proper coding.
+- Ironed out the distribution of work and got our workspace ready to begin proper coding.
+- Reread the documentation for Chef and refamiliarized myself with some old coding projects I did in C to try and remember the language
 
 ### date y
 
