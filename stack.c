@@ -13,13 +13,13 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
   StackNode* top;
 };
 
-Stack* createStack() {
+struct Stack* createStack() {
   Stack* stack = (Stack*)malloc(sizeof(Stack));
   stack->top = NULL;
   return stack;
 }
 
-void deleteStack(Stack* stack) {
+void deleteStack(struct Stack* stack) {
   while (!isEmpty(stack)) {
     pop(stack);
   }
@@ -33,13 +33,13 @@ StackNode* createStackNode(double ingredient) {
   return newNode;
 }
 
-int push(Stack* stack, double ingredient) {
+int push(struct Stack* stack, double ingredient) {
   StackNode* newNode = createStackNode(ingredient);
   newNode->next = stack->top;
   stack->top = newNode;
 }
 
-void pushNSpacesDown(Stack* stack, double ingredient, int n) {
+void pushNSpacesDown(struct Stack* stack, double ingredient, int n) {
   if (n == 0) {
     push(stack, ingredient);
     return;
@@ -59,7 +59,7 @@ void pushNSpacesDown(Stack* stack, double ingredient, int n) {
   current->next = newNode;
 }
 
-double pop(Stack* stack) {
+double pop(struct Stack* stack) {
   StackNode* temp = stack->top;
   double poppedData = temp->data;
   stack->top = temp->next;
@@ -67,17 +67,17 @@ double pop(Stack* stack) {
   return poppedData;
 }
 
-double peek(Stack* stack) {
+double peek(struct Stack* stack) {
   return stack->top->data;
 }
 
-int countElements(Stack* stack) {
+int countElements(struct Stack* stack) {
   int count = 0;
   StackNode* current = stack->top;
   return count;
 }
 
-double* getStackElements(Stack* stack, int count) { // This function makes the stack into an array which can be rearranged
+double* getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
   double* elements = (double*)malloc(countElements(stack));
 
   StackNode* current = stack->top;
@@ -88,7 +88,7 @@ double* getStackElements(Stack* stack, int count) { // This function makes the s
   return elements;
 }
 
-void randomizeStack(Stack* stack) {
+void randomizeStack(struct Stack* stack) {
   int count = countElements(stack);
   if (count < 2) {
     return; // No need to randomize if there are less than 2 (because then there's only one)
