@@ -39,8 +39,8 @@ double pop(Stack* stack) {
   return poppedData;
 }
 
-char* peek(Stack* stack) {
-  
+double peek(Stack* stack) {
+  return stack->top->data;
 }
 
 int isEmpty(Stack* stack) {
