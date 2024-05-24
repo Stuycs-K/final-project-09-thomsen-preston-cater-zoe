@@ -19,6 +19,8 @@ info
 - Ironed out the distribution of work and got our workspace ready to begin proper coding.
 - Reread the documentation for Chef and refamiliarized myself with some old coding projects I did in C to try and remember the language
 
-### date y
+### 5/23/2024
 
-info
+- Implemented a dynamic stack system into C with stack.c and stack.h after much consideration over the merits of dynamic and static stack systems
+
+### 5/24/2024
