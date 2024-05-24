@@ -31,12 +31,16 @@ int push(Stack* stack, double ingredient) {
   stack->top = newNode;
 }
 
-int pop(Stack* stack, double ingredient) {
-
+double pop(Stack* stack) {
+  StackNode* temp = stack->top;
+  double poppedData = temp->data;
+  stack->top = temp->next;
+  free(temp);
+  return poppedData;
 }
 
-char* peek(Stack* stack, double ingredient) {
-
+char* peek(Stack* stack) {
+  
 }
 
 int isEmpty(Stack* stack) {

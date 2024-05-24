@@ -12,8 +12,8 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
 
 Stack* createStack();
 int push(Stack* stack, char* ingredient);
-int pop(Stack* stack, char* ingredient);
-char* peek(Stack* stack, char* ingredient);
+double pop(Stack* stack); //Returns the data of node that is popped.
+char* peek(Stack* stack);
 int isEmpty(Stack* stack);
 
 #endif // STACK_H
