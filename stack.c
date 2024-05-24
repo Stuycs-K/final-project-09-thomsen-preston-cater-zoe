@@ -12,22 +12,22 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
     StackNode* top;
 };
 
-int push(double[] stack, double ingredient) {
+int push(Stack* stack, double ingredient) {
 
 }
 
-int pop(double[] stack, double ingredient) {
+int pop(Stack* stack, double ingredient) {
 
 }
 
-char* peek(double[] stack, double ingredient) {
+char* peek(Stack* stack, double ingredient) {
 
 }
 
-int isFull(double[] stack) {
+int isEmpty(Stack* stack) {
 
 }
 
-int isEmpty(double[] stack) {
+int isFull(Stack* stack) { //isFull will return positive if full, negative if empty, and 0 is neither
 
 }
