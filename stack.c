@@ -10,11 +10,11 @@ struct StackNode { //This is the struct for each node of the stack, which refere
 };
 
 struct Stack { //This is to refer to each individual stack as a whole, all it needs is the top node.
-  StackNode* top;
+  struct StackNode* top;
 };
 
 struct Stack* createStack() {
-  Stack* stack = (Stack*)malloc(sizeof(Stack));
+  Stack* stack = malloc(sizeof(Stack));
   stack->top = NULL;
   return stack;
 }
