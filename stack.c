@@ -18,6 +18,13 @@ Stack* createStack() {
     return stack;
 }
 
+void deleteStack(Stack* stack) {
+    while (!isEmpty(stack)) {
+        pop(stack);
+    }
+    free(stack);
+}
+
 StackNode* createStackNode(double data) {
     StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
     newNode->data = data;
@@ -31,6 +38,26 @@ int push(Stack* stack, double ingredient) {
   stack->top = newNode;
 }
 
+void pushNSpacesDown(Stack* stack, double data, int n) {
+  if (n == 0) {
+    push(stack, data);
+    return;
+  }
+
+  StackNode* current = stack->top;
+  for (int i = 0; i < n - 1; i++) {
+    if (current == NULL) {
+      fprintf(stderr, "Stack does not have %d elements\n", n);
+      exit(EXIT_FAILURE);
+    }
+    current = current->next;
+  }
+
+  StackNode* newNode = createStackNode(data);
+  newNode->next = current->next;
+  current->next = newNode;
+}
+
 double pop(Stack* stack) {
   StackNode* temp = stack->top;
   double poppedData = temp->data;
@@ -41,6 +68,16 @@ double pop(Stack* stack) {
 
 double peek(Stack* stack) {
   return stack->top->data;
+}
+
+int countElements(Stack* stack) {
+    int count = 0;
+    StackNode* current = stack->top;
+    while (current != NULL) {
+        count++;
+        current = current->next;
+    }
+    return count;
 }
 
 int isEmpty(Stack* stack) {
