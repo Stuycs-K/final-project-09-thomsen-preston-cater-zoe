@@ -3,10 +3,47 @@
 
 #include <stdbool.h>
 
+enum State {
+  DRY,
+  LIQUID,
+  UNKNOWN
+};
+
 struct Ingredient {
   char name[256];
-  bool dry;
+  enum State state;
   long count;
+};
+
+enum Command {
+  INPUT,
+  PUSH,
+  POP,
+  ADD,
+  ADD_MANY,
+  SUBTRACT,
+  MULTIPLY,
+  DIVIDE,
+  GLYPH,
+  GLYPH_MANY,
+  PUSHDOWN,
+  PUSHDOWN_CONST,
+  RANDOMIZE,
+  CLEAN,
+  PRINT,
+  WHILE,
+  END,
+  BREAK,
+  SUBROUTINE,
+  RETURN
+};
+
+struct Step {
+  enum Command command;
+  char ingredient[256];
+  int bowl;
+  char string[256];
+  int val;
 };
 
 struct Recipe {

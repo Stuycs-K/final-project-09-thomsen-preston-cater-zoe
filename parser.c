@@ -10,7 +10,7 @@ bool hasPrefix(const char *str, const char *pre){
 }
 
 void printIngredient(struct Ingredient ing){
-    printf("%ld\t%s\t%s\n", ing.count, ing.dry ? "DRY" : "WET", ing.name);
+    printf("%ld\t%s\t%s\n", ing.count, (char*[]){"DRY", "WET", "???"}[ing.state], ing.name);
 }
 
 char *readUntil(char *str, int n, char c, FILE *stream){
@@ -41,27 +41,27 @@ struct Ingredient strToIng(char *str){
   char* postmeasure = trimSpaces(strchr(text, ' '));
 
   if(hasPrefix(text, "heaped ") || hasPrefix(text, "level ")){
-    ing.dry = true;
+    ing.state = DRY;
     strncpy(ing.name, trimSpaces(strchr(postmeasure, ' ')), 256);
   }
   else if(hasPrefix(text, "ml ")   || hasPrefix(text, "l ") ||
           hasPrefix(text, "dash ") || hasPrefix(text, "dashes ")){
-    ing.dry = false;
+    ing.state = LIQUID;
     strncpy(ing.name, postmeasure, 256);
   }
   else if(hasPrefix(text, "g ")          || hasPrefix(text, "kg ") ||
           hasPrefix(text, "pinch ")      || hasPrefix(text, "pinches ")){
-    ing.dry = true;
+    ing.state = DRY;
     strncpy(ing.name, postmeasure, 256);
   }
   else if(hasPrefix(text, "cup ")        || hasPrefix(text, "cups ") ||
           hasPrefix(text, "teaspoon ")   || hasPrefix(text, "teaspoons ") ||
           hasPrefix(text, "tablespoon ") || hasPrefix(text, "tablespoons ")){
-    ing.dry = true;
+    ing.state = UNKNOWN;
     strncpy(ing.name, postmeasure, 256);
   }
   else{
-    ing.dry = true;
+    ing.state = UNKNOWN;
     strncpy(ing.name, text, 256);
   }
 
