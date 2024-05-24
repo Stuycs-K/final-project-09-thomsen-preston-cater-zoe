@@ -12,6 +12,13 @@ bool hasPrefix(const char *str, const char *pre){
 void printIngredient(struct Ingredient ing){
     printf("%ld\t%s\t%s\n", ing.count, (char*[]){"DRY", "WET", "???"}[ing.state], ing.name);
 }
+void printStep(struct Ingredient *ings, struct Step step){
+  printf("%d\tbowl_%d", step.command, step.bowl);
+  if(step.ingredient != -1) printf("\t%s", ings[step.ingredient].name);
+  if(step.val != -1) printf("\t%d", step.val);
+  if(step.string) printf("\t%s", step.string);
+  printf("\n");
+}
 
 char *readUntil(char *str, int n, char c, FILE *stream){
   char *curr = str;
@@ -68,6 +75,16 @@ struct Ingredient strToIng(char *str){
   return ing;
 }
 
+struct Step strToStep(struct Ingredient* ings, char *str){
+  struct Step step;
+  step.command = PUSH;
+  step.ingredient = 0;
+  step.bowl = 0;
+  step.val = -1;
+  strncpy(step.string, "str", 256);
+  return step;
+}
+
 // Like fgets, but removes the trailing newline
 char *fgets2(char *restrict s, int n, FILE *restrict stream){
   fgets(s, n, stream);
@@ -100,7 +117,7 @@ struct Recipe parse(const char *fname){
   for(int i=0; i<6; i++){
     readUntil(line, 256, '.', file);
     skipSpaces(file);
-    printf("%s\n", line);
+    recipe.steps[i] = strToStep(recipe.ingredients, line);
   }
 
   return recipe;

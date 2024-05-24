@@ -40,16 +40,17 @@ enum Command {
 
 struct Step {
   enum Command command;
-  char ingredient[256];
+  int ingredient;
   int bowl;
-  char string[256];
   int val;
+  char string[256];
 };
 
 struct Recipe {
   char title[256];
   int ingred_count;
   struct Ingredient ingredients[64];
+  struct Step steps[64];
 };
 
 void printIngredient(struct Ingredient ing);
