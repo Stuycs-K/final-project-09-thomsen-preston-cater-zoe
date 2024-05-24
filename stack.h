@@ -13,6 +13,6 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
 int push(Stack* stack, char* ingredient);
 int pop(Stack* stack, char* ingredient);
 char* peek(Stack* stack, char* ingredient);
-int isFull(Stack* stack);
+int isEmpty(Stack* stack);
 
 #endif // STACK_H
