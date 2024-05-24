@@ -114,7 +114,3 @@ void randomizeStack(Stack* stack) {
 
   free(elements);
 }
-
-int isEmpty(Stack* stack) {
-  return stack->top == NULL;
-}
