@@ -1,10 +1,10 @@
 .PHONY: run compile clean
 
 run: main
-	./main 'recipes/souffle.chef'
+	./main 'recipes/opposition.chef'
 
 compile main: main.o parser.o
-	gcc -Wall -Werror -o main main.o parser.o
+	gcc -Wall -Werror -fsanitize=address,undefined -o main main.o parser.o
 
 main.o: main.c parser.c parser.h
 	gcc -c main.c

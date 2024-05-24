@@ -2,6 +2,7 @@
 #include <stdlib.h> // strol
 #include <string.h> // strncmp, strlen, strchr, strncpy, strcspn
 #include <stdbool.h> // bool, true, false
+#include <ctype.h>  // isspace
 #include "parser.h" // Ingredient, Recipe
 
 bool hasPrefix(const char *str, const char *pre){
@@ -12,18 +13,36 @@ void printIngredient(struct Ingredient ing){
     printf("%ld\t%s\t%s\n", ing.count, ing.dry ? "DRY" : "WET", ing.name);
 }
 
+char *readUntil(char *str, int n, char c, FILE *stream){
+  char *curr = str;
+  while ((*curr = getc(stream)) != c && *curr != EOF) curr++;
+  *curr = '\0';
+  return str;
+}
+
+void skipSpaces(FILE *stream){
+  char curr;
+  while(isspace(curr = getc(stream)) && curr != EOF);
+  ungetc(curr, stream);
+}
+
+char *trimSpaces(char *curr){
+  while(curr && isspace(*curr)) curr++;
+  return curr;
+}
+
 // Read a single-line ingredient string as an Ingredient
 struct Ingredient strToIng(char *str){
   struct Ingredient ing;
   
   char* text;
   ing.count = strtol(str, &text, 10);
-  text++;
-  char* postmeasure = strchr(text, ' ') + 1;
+  text = trimSpaces(text);
+  char* postmeasure = trimSpaces(strchr(text, ' '));
 
   if(hasPrefix(text, "heaped ") || hasPrefix(text, "level ")){
     ing.dry = true;
-    strncpy(ing.name, strchr(postmeasure, ' ') + 1, 256);
+    strncpy(ing.name, trimSpaces(strchr(postmeasure, ' ')), 256);
   }
   else if(hasPrefix(text, "ml ")   || hasPrefix(text, "l ") ||
           hasPrefix(text, "dash ") || hasPrefix(text, "dashes ")){
@@ -58,7 +77,7 @@ char *fgets2(char *restrict s, int n, FILE *restrict stream){
 
 // Takes a filename and parses the file as a recipe
 struct Recipe parse(const char *fname){
-  FILE* file = fopen(fname, "r");
+  FILE *file = fopen(fname, "r");
   struct Recipe recipe;
   char line[256];
 
@@ -68,10 +87,20 @@ struct Recipe parse(const char *fname){
   // Skip everything after the title and before the ingredients
   while(strcmp(fgets2(line, 256, file), "Ingredients."));
 
-  // Read ingredients one at a time until the next blank line
+  // Read ingredients one line at a time until the next blank line
   recipe.ingred_count = 0;
   while(strcmp(fgets2(line, 256, file), "")){
     recipe.ingredients[recipe.ingred_count++] = strToIng(line);
+  }
+
+  // Skip everything after the ingredients and before the method
+  while(strcmp(fgets2(line, 256, file), "Method."));
+
+  // Read method one sentence at a time until
+  for(int i=0; i<6; i++){
+    readUntil(line, 256, '.', file);
+    skipSpaces(file);
+    printf("%s\n", line);
   }
 
   return recipe;
