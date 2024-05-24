@@ -12,8 +12,23 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
     StackNode* top;
 };
 
+Stack* createStack() {
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
+    stack->top = NULL;
+    return stack;
+}
+
+StackNode* createStackNode(double data) {
+    StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
 int push(Stack* stack, double ingredient) {
-  
+  StackNode* newNode = createStackNode(ingredient);
+  newNode->next = stack->top;
+  stack->top = newNode;
 }
 
 int pop(Stack* stack, double ingredient) {

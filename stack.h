@@ -10,6 +10,7 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
     StackNode* top;
 };
 
+Stack* createStack();
 int push(Stack* stack, char* ingredient);
 int pop(Stack* stack, char* ingredient);
 char* peek(Stack* stack, char* ingredient);
