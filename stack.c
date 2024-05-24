@@ -3,8 +3,17 @@
 #include <string.h> // strncmp, strlen, strchr, strncpy, strcspn
 #include "stack.h" // Implementation of stacks into C
 
+struct StackNode { //This is the struct for each node of the stack, which references the next node in the stack
+    double data;
+    struct StackNode* next;
+};
+
+struct Stack { //This is to refer to each individual stack as a whole, all it needs is the top node.
+    StackNode* top;
+};
+
 int push(double[] stack, double ingredient) {
-    
+
 }
 
 int pop(double[] stack, double ingredient) {
