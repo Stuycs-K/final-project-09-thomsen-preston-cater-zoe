@@ -16,7 +16,7 @@ void printIngredient(struct Ingredient ing){
 void printStep(struct Ingredient *ings, struct Step step){
   printf("%-12s\tbowl_%d", bob[step.command], step.bowl);
   printf("\t%-12s", step.ingredient == -1 ? "" : ings[step.ingredient].name);
-  if(step.val != -1) printf("\t%d", step.val);
+  printf("\t%d", step.val);
   if(step.string) printf("\t%s", step.string);
   printf("\n");
 }
@@ -78,40 +78,21 @@ struct Ingredient strToIng(char *str){
 
 struct Step strToStep(struct Ingredient* ings, char *str){
   struct Step step;
-  step.command = PUSH;
+  step.command = -1;
   step.ingredient = -1;
-  step.bowl = 0;
+  step.bowl = -1;
   step.val = -1;
-  strncpy(step.string, "str", 256);
+  strcpy(step.string, "");
 
   char *regexString;
-  size_t maxGroups = 4;
-  regex_t regexCompiled;
-  regmatch_t groupArray[maxGroups];
-
+  short flags;
 
   if(hasPrefix(str, "Take ")){
     step.command = INPUT;
   } else if(hasPrefix(str, "Put ")){
     step.command = PUSH;
-    regexString = "Put (.+) into (the |.+th )?mixing bowl";
-    regcomp(&regexCompiled, regexString, REG_EXTENDED);
-    if(regexec(&regexCompiled, str, maxGroups, groupArray, 0) == 0){
-      if(groupArray[1].rm_so == (size_t)-1) step.ingredient = -1;
-      else{
-        for(int i=0; i<20; i++){
-          if(!strncmp(ings[i].name, str + groupArray[1].rm_so, groupArray[1].rm_eo - groupArray[1].rm_so)) step.ingredient = i;
-        }
-      }
-      if(groupArray[2].rm_so == (size_t)-1) step.bowl = 0;
-      else{
-        if(!strncmp("the ", str + groupArray[2].rm_so, groupArray[2].rm_eo - groupArray[2].rm_so)) step.bowl = 0;
-        else{
-          sscanf(str + groupArray[2].rm_so, "%dth %*[^\n]", &step.bowl);
-        }
-      }
-    }
-    regfree(&regexCompiled);
+    regexString = "Put (.+) into (the |.+th )?mi()xing bowl";
+    flags = 0110;
   } else if(hasPrefix(str, "Fold ")){
     step.command = POP;
   } else if(hasPrefix(str, "Add ")){
@@ -126,18 +107,8 @@ struct Step strToStep(struct Ingredient* ings, char *str){
     step.command = ADD_MANY;
   } else if(hasPrefix(str, "Liquefy contents ")){
     step.command = GLYPH_MANY;
-    regexString = "Liquefy contents of (the|.+th)? mixing bowl";
-    regcomp(&regexCompiled, regexString, REG_EXTENDED);
-    if(regexec(&regexCompiled, str, maxGroups, groupArray, 0) == 0){
-      if(groupArray[1].rm_so == (size_t)-1) step.bowl = 0;
-      else{
-        if(!strncmp("the", str + groupArray[1].rm_so, groupArray[1].rm_eo - groupArray[1].rm_so)) step.bowl = 0;
-        else{
-          sscanf(str + groupArray[1].rm_so, "%dth%*[^\n]", &step.bowl);
-        }
-      }
-    }
-    regfree(&regexCompiled);
+    regexString = "Liquefy con()tents of (the |.+th )?mixi()ng bowl";
+    flags = 0010;
   } else if(hasPrefix(str, "Liquefy ")){
     step.command = GLYPH;
   } else if(hasPrefix(str, "Stir ")){
@@ -149,26 +120,9 @@ struct Step strToStep(struct Ingredient* ings, char *str){
   } else if(hasPrefix(str, "Clean ")){
     step.command = CLEAN;
   } else if(hasPrefix(str, "Pour ")){
-    regexString = "Pour contents of (the|.+th)? mixing bowl into (the|.+th)? baking dish";
-    regcomp(&regexCompiled, regexString, REG_EXTENDED);
-    if(regexec(&regexCompiled, str, maxGroups, groupArray, 0) == 0){
-      if(groupArray[1].rm_so == (size_t)-1) step.bowl = 0;
-      else{
-        if(!strncmp("the", str + groupArray[1].rm_so, groupArray[1].rm_eo - groupArray[1].rm_so)) step.bowl = 0;
-        else{
-          sscanf(str + groupArray[1].rm_so, "%dth%*[^\n]", &step.bowl);
-        }
-      }
-      if(groupArray[2].rm_so == (size_t)-1) step.val = 0;
-      else{
-        if(!strncmp("the", str + groupArray[2].rm_so, groupArray[2].rm_eo - groupArray[2].rm_so)) step.val = 0;
-        else{
-          sscanf(str + groupArray[2].rm_so, "%dth%*[^\n]", &step.val);
-        }
-      }
-    }
-    regfree(&regexCompiled);
     step.command = PRINT;
+    regexString = "Po()ur contents of (the |.+th )?mixing bowl into (the |.+th )?baking dish";
+    flags = 0011;
   } else if(!strcmp(str, "Set aside")){
     step.command = END;
   } else if(hasPrefix(str, "Serve with ")){
@@ -178,6 +132,30 @@ struct Step strToStep(struct Ingredient* ings, char *str){
   } else{
     step.command = WHILE;
   }
+
+  regex_t regexCompiled;
+  regmatch_t groupArray[4];
+  char *fields[4];
+  regcomp(&regexCompiled, regexString, REG_EXTENDED);
+  if(!regexec(&regexCompiled, str, 4, groupArray, 0)){
+    for(int i=0; i<3; i++){
+      fields[i] = str + groupArray[i+1].rm_so;
+      str[groupArray[i+1].rm_eo] = '\0';
+    }
+
+    if((flags >> 6 & 0007) == 1){
+      for(int i=0; i<20; i++) if(!strcmp(ings[i].name, fields[0])) step.ingredient = i;
+    }
+    if((flags >> 3 & 0007) == 1){
+      if(!strcmp("", fields[1]) || !strcmp("the ", fields[1])) step.bowl = 0;
+      else sscanf(fields[1], "%dth ", &step.bowl);
+    }
+    if((flags >> 0 & 0007) == 1){
+      if(!strcmp("", fields[2]) || !strcmp("the ", fields[2])) step.val = 0;
+      else sscanf(fields[2], "%dth ", &step.val);
+    }
+  }
+  regfree(&regexCompiled);
 
   return step;
 }
