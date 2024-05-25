@@ -94,7 +94,7 @@ struct Step strToStep(struct Ingredient* ings, char *str){
     step.command = INPUT;
   } else if(hasPrefix(str, "Put ")){
     step.command = PUSH;
-    regexString = "Put (.+) into (the|.+th)? mixing bowl";
+    regexString = "Put (.+) into (the |.+th )?mixing bowl";
     regcomp(&regexCompiled, regexString, REG_EXTENDED);
     if(regexec(&regexCompiled, str, maxGroups, groupArray, 0) == 0){
       if(groupArray[1].rm_so == (size_t)-1) step.ingredient = -1;
@@ -105,9 +105,9 @@ struct Step strToStep(struct Ingredient* ings, char *str){
       }
       if(groupArray[2].rm_so == (size_t)-1) step.bowl = 0;
       else{
-        if(!strncmp("the", str + groupArray[2].rm_so, groupArray[2].rm_eo - groupArray[2].rm_so)) step.bowl = 0;
+        if(!strncmp("the ", str + groupArray[2].rm_so, groupArray[2].rm_eo - groupArray[2].rm_so)) step.bowl = 0;
         else{
-          sscanf(str + groupArray[2].rm_so, "%dth%*[^\n]", &step.bowl);
+          sscanf(str + groupArray[2].rm_so, "%dth %*[^\n]", &step.bowl);
         }
       }
     }
