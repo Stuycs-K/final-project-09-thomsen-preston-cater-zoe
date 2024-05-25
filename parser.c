@@ -3,6 +3,7 @@
 #include <string.h> // strncmp, strlen, strchr, strncpy, strcspn
 #include <stdbool.h> // bool, true, false
 #include <ctype.h>  // isspace
+#include <regex.h>
 #include "parser.h" // Ingredient, Recipe
 
 bool hasPrefix(const char *str, const char *pre){
@@ -13,8 +14,8 @@ void printIngredient(struct Ingredient ing){
     printf("%ld\t%s\t%s\n", ing.count, (char*[]){"DRY", "WET", "???"}[ing.state], ing.name);
 }
 void printStep(struct Ingredient *ings, struct Step step){
-  printf("%d\tbowl_%d", step.command, step.bowl);
-  if(step.ingredient != -1) printf("\t%s", ings[step.ingredient].name);
+  printf("%-12s\tbowl_%d", bob[step.command], step.bowl);
+  printf("\t%-12s", step.ingredient == -1 ? "" : ings[step.ingredient].name);
   if(step.val != -1) printf("\t%d", step.val);
   if(step.string) printf("\t%s", step.string);
   printf("\n");
@@ -78,10 +79,106 @@ struct Ingredient strToIng(char *str){
 struct Step strToStep(struct Ingredient* ings, char *str){
   struct Step step;
   step.command = PUSH;
-  step.ingredient = 0;
+  step.ingredient = -1;
   step.bowl = 0;
   step.val = -1;
   strncpy(step.string, "str", 256);
+
+  char *regexString;
+  size_t maxGroups = 4;
+  regex_t regexCompiled;
+  regmatch_t groupArray[maxGroups];
+
+
+  if(hasPrefix(str, "Take ")){
+    step.command = INPUT;
+  } else if(hasPrefix(str, "Put ")){
+    step.command = PUSH;
+    regexString = "Put (.+) into (the|.+th)? mixing bowl";
+    regcomp(&regexCompiled, regexString, REG_EXTENDED);
+    if(regexec(&regexCompiled, str, maxGroups, groupArray, 0) == 0){
+      if(groupArray[1].rm_so == (size_t)-1) step.ingredient = -1;
+      else{
+        for(int i=0; i<20; i++){
+          if(!strncmp(ings[i].name, str + groupArray[1].rm_so, groupArray[1].rm_eo - groupArray[1].rm_so)) step.ingredient = i;
+        }
+      }
+      if(groupArray[2].rm_so == (size_t)-1) step.bowl = 0;
+      else{
+        if(!strncmp("the", str + groupArray[2].rm_so, groupArray[2].rm_eo - groupArray[2].rm_so)) step.bowl = 0;
+        else{
+          sscanf(str + groupArray[2].rm_so, "%dth%*[^\n]", &step.bowl);
+        }
+      }
+    }
+    regfree(&regexCompiled);
+  } else if(hasPrefix(str, "Fold ")){
+    step.command = POP;
+  } else if(hasPrefix(str, "Add ")){
+    step.command = ADD;
+  } else if(hasPrefix(str, "Remove ")){
+    step.command = SUBTRACT;
+  } else if(hasPrefix(str, "Combine ")){
+    step.command = MULTIPLY;
+  } else if(hasPrefix(str, "Divide ")){
+    step.command = DIVIDE;
+  } else if(hasPrefix(str, "Add dry ")){
+    step.command = ADD_MANY;
+  } else if(hasPrefix(str, "Liquefy contents ")){
+    step.command = GLYPH_MANY;
+    regexString = "Liquefy contents of (the|.+th)? mixing bowl";
+    regcomp(&regexCompiled, regexString, REG_EXTENDED);
+    if(regexec(&regexCompiled, str, maxGroups, groupArray, 0) == 0){
+      if(groupArray[1].rm_so == (size_t)-1) step.bowl = 0;
+      else{
+        if(!strncmp("the", str + groupArray[1].rm_so, groupArray[1].rm_eo - groupArray[1].rm_so)) step.bowl = 0;
+        else{
+          sscanf(str + groupArray[1].rm_so, "%dth%*[^\n]", &step.bowl);
+        }
+      }
+    }
+    regfree(&regexCompiled);
+  } else if(hasPrefix(str, "Liquefy ")){
+    step.command = GLYPH;
+  } else if(hasPrefix(str, "Stir ")){
+    step.command = PUSHDOWN;
+  } else if(hasPrefix(str, "Stir ")){ // not working
+    step.command = PUSHDOWN_CONST;
+  } else if(hasPrefix(str, "Mix ")){
+    step.command = RANDOMIZE;
+  } else if(hasPrefix(str, "Clean ")){
+    step.command = CLEAN;
+  } else if(hasPrefix(str, "Pour ")){
+    regexString = "Pour contents of (the|.+th)? mixing bowl into (the|.+th)? baking dish";
+    regcomp(&regexCompiled, regexString, REG_EXTENDED);
+    if(regexec(&regexCompiled, str, maxGroups, groupArray, 0) == 0){
+      if(groupArray[1].rm_so == (size_t)-1) step.bowl = 0;
+      else{
+        if(!strncmp("the", str + groupArray[1].rm_so, groupArray[1].rm_eo - groupArray[1].rm_so)) step.bowl = 0;
+        else{
+          sscanf(str + groupArray[1].rm_so, "%dth%*[^\n]", &step.bowl);
+        }
+      }
+      if(groupArray[2].rm_so == (size_t)-1) step.val = 0;
+      else{
+        if(!strncmp("the", str + groupArray[2].rm_so, groupArray[2].rm_eo - groupArray[2].rm_so)) step.val = 0;
+        else{
+          sscanf(str + groupArray[2].rm_so, "%dth%*[^\n]", &step.val);
+        }
+      }
+    }
+    regfree(&regexCompiled);
+    step.command = PRINT;
+  } else if(!strcmp(str, "Set aside")){
+    step.command = END;
+  } else if(hasPrefix(str, "Serve with ")){
+    step.command = SUBROUTINE;
+  } else if(hasPrefix(str, "Refrigerate ")){
+    step.command = RETURN;
+  } else{
+    step.command = WHILE;
+  }
+
   return step;
 }
 
@@ -114,7 +211,7 @@ struct Recipe parse(const char *fname){
   while(strcmp(fgets2(line, 256, file), "Method."));
 
   // Read method one sentence at a time until
-  for(int i=0; i<6; i++){
+  for(int i=0; i<14; i++){
     readUntil(line, 256, '.', file);
     skipSpaces(file);
     recipe.steps[i] = strToStep(recipe.ingredients, line);

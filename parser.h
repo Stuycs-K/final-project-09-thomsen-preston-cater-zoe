@@ -1,8 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <stdbool.h>
-
 enum State {
   DRY,
   LIQUID,
@@ -38,6 +36,8 @@ enum Command {
   RETURN
 };
 
+static char *bob[] = {"INPUT", "PUSH", "POP", "ADD", "ADD_MANY", "SUBTRACT", "MULTIPLY", "DIVIDE", "GLYPH", "GLYPH_MANY", "PUSHDOWN", "PUSHDOWN_CONST", "RANDOMIZE", "CLEAN", "PRINT", "WHILE", "END", "BREAK", "SUBROUTINE", "RETURN"};
+
 struct Step {
   enum Command command;
   int ingredient;
@@ -54,6 +54,7 @@ struct Recipe {
 };
 
 void printIngredient(struct Ingredient ing);
+void printStep(struct Ingredient *ings, struct Step step);
 
 struct Recipe parse(const char *fname);
   
