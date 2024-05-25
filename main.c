@@ -16,4 +16,7 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<recipe.ingred_count; i++){
         printIngredient(recipe.ingredients[i]);
     }
+    for(int i=0; i<16; i++){
+        printStep(recipe.ingredients, recipe.steps[i]);
+    }
 }
