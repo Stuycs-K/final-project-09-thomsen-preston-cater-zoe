@@ -78,6 +78,11 @@ struct Ingredient strToIng(char *str){
   return ing;
 }
 
+struct CommandParse {
+  enum Command command;
+  char *pattern;
+};
+
 struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   struct Step step;
   step.command = -1;
@@ -87,6 +92,28 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   strcpy(step.string, "");
 
   char *pattern;
+
+  struct CommandParse parses[19] = {
+    {INPUT, "Take .+"},
+    {PUSH, "Put (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
+    {POP, "Fold .+"},
+    {ADD_MANY, "Add dry .+"},
+    {ADD, "Add (?<ingredient>.+) to (the |(?<bowl>.+)th )?mixing bowl"},
+    {SUBTRACT, "Remove (?<ingredient>.+) from (the |(?<bowl>.+)th )?mixing bowl"},
+    {MULTIPLY, "Combine .+"},
+    {DIVIDE, "Divide .+"},
+    {GLYPH_MANY, "Liquefy contents of (the |(?<bowl>.+)th )?mixing bowl"},
+    {GLYPH, "Liquefy .+"},
+    {PUSHDOWN, "Stir .+"},
+    {PUSHDOWN_CONST, "Stir .+"},
+    {RANDOMIZE, "Mix .+"},
+    {CLEAN, "Clean .+"},
+    {PRINT, "Pour contents of (the |(?<bowl>.+)th )?mixing bowl into (the |(?<dish>.+)th )?baking dish"},
+    {END, "Set aside"},
+    {SUBROUTINE, "Serve .+"},
+    {RETURN, "Refrigerate .+"},
+    {WHILE, ".+"}
+  };
 
   if(hasPrefix(str, "Take ")){
     step.command = INPUT;
@@ -142,10 +169,25 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   pcre2_code *re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
   if(re == NULL) printf("compilation error\n");
 
+  pcre2_code *res[19];
+  for(int i=0; i<19; i++){
+  res[i] = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
+  if(res[i] == NULL) printf("compilation error\n");
+  }
+
   pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(re, NULL);
   int rc = pcre2_match(re, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, match_data, NULL);
   PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
   if (rc < 0) printf("matching error %d\n", rc);
+
+  pcre2_match_data *matches[19];
+  PCRE2_SIZE *ovectors[19];
+  for(int i=0; i<19; i++){
+    matches[i] = pcre2_match_data_create_from_pattern(res[i], NULL);
+    int rc = pcre2_match(res[i], str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, matches[i], NULL);
+    ovectors[i] = pcre2_get_ovector_pointer(matches[i]);
+    if (rc < 0) printf("matching error %d\n", rc);
+  }
 
   pcre2_pattern_info(re, PCRE2_INFO_NAMECOUNT, &namecount);
   pcre2_pattern_info(re, PCRE2_INFO_NAMEENTRYSIZE, &name_entry_size);
@@ -172,6 +214,10 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
 
   pcre2_match_data_free(match_data);
   pcre2_code_free(re);
+  for(int i=0; i<19; i++){
+    pcre2_match_data_free(matches[i]);
+    pcre2_code_free(res[i]);
+  }
 
   return step;
 }
