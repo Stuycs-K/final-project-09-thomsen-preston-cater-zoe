@@ -76,7 +76,7 @@ struct Ingredient strToIng(char *str){
   return ing;
 }
 
-struct Step strToStep(struct Ingredient* ings, char *str){
+struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   struct Step step;
   step.command = -1;
   step.ingredient = -1;
@@ -95,14 +95,24 @@ struct Step strToStep(struct Ingredient* ings, char *str){
     flags = 0110;
   } else if(hasPrefix(str, "Fold ")){
     step.command = POP;
+    regexString = "Fold (.+) into (the |.+th )?mi()xing bowl";
+    flags = 0110;
   } else if(hasPrefix(str, "Add ")){
     step.command = ADD;
+    regexString = "Add (.+) to (the |.+th )?mixing bowl()";
+    flags = 0110;
   } else if(hasPrefix(str, "Remove ")){
     step.command = SUBTRACT;
+    regexString = "Remove (.+) from (the |.+th )?mixing bowl()";
+    flags = 0110;
   } else if(hasPrefix(str, "Combine ")){
     step.command = MULTIPLY;
+    regexString = "Combine (.+) into (the |.+th )?mixing bowl()";
+    flags = 0110;
   } else if(hasPrefix(str, "Divide ")){
     step.command = DIVIDE;
+    regexString = "Divide (.+) into (the |.+th )?mixing bowl()";
+    flags = 0110;
   } else if(hasPrefix(str, "Add dry ")){
     step.command = ADD_MANY;
   } else if(hasPrefix(str, "Liquefy contents ")){
@@ -142,17 +152,14 @@ struct Step strToStep(struct Ingredient* ings, char *str){
       fields[i] = str + groupArray[i+1].rm_so;
       str[groupArray[i+1].rm_eo] = '\0';
     }
-
     if((flags >> 6 & 0007) == 1){
-      for(int i=0; i<20; i++) if(!strcmp(ings[i].name, fields[0])) step.ingredient = i;
+      for(int i=0; i<ingred_count; i++) if(!strcmp(ings[i].name, fields[0])) step.ingredient = i;
     }
     if((flags >> 3 & 0007) == 1){
-      if(!strcmp("", fields[1]) || !strcmp("the ", fields[1])) step.bowl = 0;
-      else sscanf(fields[1], "%dth ", &step.bowl);
+      if(0 >= sscanf(fields[1], "%dth ", &step.bowl)) step.bowl = 0;
     }
     if((flags >> 0 & 0007) == 1){
-      if(!strcmp("", fields[2]) || !strcmp("the ", fields[2])) step.val = 0;
-      else sscanf(fields[2], "%dth ", &step.val);
+      if(0 >= sscanf(fields[2], "%dth ", &step.val)) step.val = 0;
     }
   }
   regfree(&regexCompiled);
@@ -192,7 +199,7 @@ struct Recipe parse(const char *fname){
   for(int i=0; i<14; i++){
     readUntil(line, 256, '.', file);
     skipSpaces(file);
-    recipe.steps[i] = strToStep(recipe.ingredients, line);
+    recipe.steps[i] = strToStep(recipe.ingredients, recipe.ingred_count, line);
   }
 
   return recipe;
