@@ -4,6 +4,8 @@
 #include <stdbool.h> // bool, true, false
 #include <ctype.h>  // isspace
 #include <regex.h>
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
 #include "parser.h" // Ingredient, Recipe
 
 bool hasPrefix(const char *str, const char *pre){
@@ -77,6 +79,9 @@ struct Ingredient strToIng(char *str){
 }
 
 struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
+  char subject[128];
+  strcpy(subject, str);
+
   struct Step step;
   step.command = -1;
   step.ingredient = -1;
@@ -86,12 +91,15 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
 
   char *regexString;
   short flags;
+  char *pattern;
+
 
   if(hasPrefix(str, "Take ")){
     step.command = INPUT;
   } else if(hasPrefix(str, "Put ")){
     step.command = PUSH;
     regexString = "Put (.+) into (the |.+th )?mi()xing bowl";
+    pattern = "Put (?<ingredient>.+) into (?:the |(?<bowl>.+)th )?mixing bowl";
     flags = 0110;
   } else if(hasPrefix(str, "Fold ")){
     step.command = POP;
@@ -100,10 +108,12 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   } else if(hasPrefix(str, "Add ")){
     step.command = ADD;
     regexString = "Add (.+) to (the |.+th )?mixing bowl()";
+    pattern = "Add (?<ingredient>.+) to (?:the |(?<bowl>.+)th )?mixing bowl";
     flags = 0110;
   } else if(hasPrefix(str, "Remove ")){
     step.command = SUBTRACT;
     regexString = "Remove (.+) from (the |.+th )?mixing bowl()";
+    pattern = "Remove (?<ingredient>.+) from (?:the |(?<bowl>.+)th )?mixing bowl";
     flags = 0110;
   } else if(hasPrefix(str, "Combine ")){
     step.command = MULTIPLY;
@@ -118,6 +128,7 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   } else if(hasPrefix(str, "Liquefy contents ")){
     step.command = GLYPH_MANY;
     regexString = "Liquefy con()tents of (the |.+th )?mixi()ng bowl";
+    pattern = "Liquefy contents of (the |(?<bowl>.+)th )?mixing bowl";
     flags = 0010;
   } else if(hasPrefix(str, "Liquefy ")){
     step.command = GLYPH;
@@ -132,6 +143,7 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   } else if(hasPrefix(str, "Pour ")){
     step.command = PRINT;
     regexString = "Po()ur contents of (the |.+th )?mixing bowl into (the |.+th )?baking dish";
+    pattern = "Pour contents of (the |(?<bowl>.+)th )?mixing bowl into (the |(?<val>.+)th )?baking dish";
     flags = 0011;
   } else if(!strcmp(str, "Set aside")){
     step.command = END;
@@ -163,6 +175,35 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
     }
   }
   regfree(&regexCompiled);
+
+  pcre2_code *re;
+  int rc;
+  int errornumber;
+  PCRE2_SIZE erroroffset;
+  PCRE2_SIZE *ovector;
+  PCRE2_SPTR name_table;
+  pcre2_match_data *match_data;
+  int namecount;
+  int name_entry_size;
+  re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
+  if(re == NULL) printf("compilation error\n");
+  match_data = pcre2_match_data_create_from_pattern(re, NULL);
+  rc = pcre2_match(re, subject, strlen(subject), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, match_data, NULL);
+  if (rc < 0) printf("matching error %d\n", rc);
+  ovector = pcre2_get_ovector_pointer(match_data);
+  pcre2_pattern_info(re, PCRE2_INFO_NAMECOUNT, &namecount);
+  pcre2_pattern_info(re, PCRE2_INFO_NAMETABLE, &name_table);
+  pcre2_pattern_info(re, PCRE2_INFO_NAMEENTRYSIZE, &name_entry_size);
+  PCRE2_SPTR tabptr = name_table;
+  printf("\n%s\n", subject);
+  for (int i = 0; i < namecount; i++) {
+    int n = (tabptr[0] << 8) | tabptr[1];
+    printf("(%d) %*s: %.*s\n", n, name_entry_size - 3, tabptr + 2,
+    (int)(ovector[2*n+1] - ovector[2*n]), subject + ovector[2*n]);
+    tabptr += name_entry_size;
+  }
+  pcre2_match_data_free(match_data);
+  pcre2_code_free(re);
 
   return step;
 }
