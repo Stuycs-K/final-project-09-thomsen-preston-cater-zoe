@@ -16,6 +16,7 @@
 
 - Implemented the parsing of five commands using POSIX regexes as a proof of concept
 - Realized the unfeasibility of the previous method and switched to using PCRE2 regexes
+- Finished implementing most of the recipe parsing using PCRE2 regexes (still need to handle the last few lines and see about going back to the previous sections with the new parsing setup)
 
 
 ## Preston Thomsen
