@@ -18,7 +18,7 @@ void printIngredient(struct Ingredient ing){
 void printStepHeaders(){
   printf("%-12s", "command name");
   printf("\tbowl#");
-  printf("\t%-16s", "ingredient name");
+  printf("\t%-16.16s", "ingredient");
   printf("\t%s", "val");
   printf("\t%s", "string");
   printf("\n");
@@ -31,7 +31,7 @@ void printStep(struct Ingredient *ings, struct Step step){
   if(step.bowl == -1) printf("\t");
   else printf("\tbowl%d", step.bowl);
 
-  printf("\t%-16s", step.ingredient == -1 ? "" : ings[step.ingredient].name);
+  printf("\t%-16.16s", step.ingredient == -1 ? "" : ings[step.ingredient].name);
 
   if(step.val == -1) printf("\t");
   else printf("\t%d", step.val);
@@ -105,24 +105,24 @@ struct CommandParse {
 
 struct CommandParse parses[20] = {
   {INPUT, "Take (?<ingredient>.+) from (the )?refrigerator"},
-  {PUSH, "Put (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
-  {POP, "Fold (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
-  {ADD_MANY, "Add dry ingredients( to (the |(?<bowl>.+)th )?mixing bowl)?"},
-  {ADD, "Add (?<ingredient>.+)( to (the |(?<bowl>.+)th )?mixing bowl)?"},
-  {SUBTRACT, "Remove (?<ingredient>.+)( from (the |(?<bowl>.+)th )?mixing bowl)?"},
-  {MULTIPLY, "Combine (?<ingredient>.+)( into (the |(?<bowl>.+)th )?mixing bowl)?"},
-  {DIVIDE, "Divide (?<ingredient>.+)( into (the |(?<bowl>.+)th )?mixing bowl)?"},
-  {GLYPH_MANY, "Liquefy contents of (the |(?<bowl>.+)th )?mixing bowl"},
+  {PUSH, "Put (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
+  {POP, "Fold (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
+  {ADD_MANY, "Add dry ingredients( to (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)?"},
+  {ADD, "Add (?<ingredient>.+)( to (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)?"},
+  {SUBTRACT, "Remove (?<ingredient>.+)( from (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)?"},
+  {MULTIPLY, "Combine (?<ingredient>.+)( into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)?"},
+  {DIVIDE, "Divide (?<ingredient>.+)( into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)?"},
+  {GLYPH_MANY, "Liquefy contents of (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
   {GLYPH, "Liquefy (?<ingredient>.+)"},
-  {PUSHDOWN_CONST, "Stir( (the |(?<bowl>.+)th )?mixing bowl)? for (?<minutes>.+) minutes.+"},
-  {PUSHDOWN, "Stir (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
-  {RANDOMIZE, "Mix( (the |(?<bowl>.+)th )?mixing bowl)? well"},
-  {CLEAN, "Clean (the |(?<bowl>.+)th )?mixing bowl"},
-  {PRINT, "Pour contents of (the |(?<bowl>.+)th )?mixing bowl into (the |(?<dish>.+)th )?baking dish"},
+  {PUSHDOWN_CONST, "Stir( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? for (?<minutes>.+) minutes?.+"},
+  {PUSHDOWN, "Stir (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
+  {RANDOMIZE, "Mix( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? well"},
+  {CLEAN, "Clean (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
+  {PRINT, "Pour contents of (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl into (the |(?<dish>.+)(st|nd|rd|th) )?baking dish"},
   {SUBROUTINE, "Serve with (?<recipe>.+)"},
   {RETURN, "Refrigerate( for (?<hours>.+) hours)?"},
   {WHILE, "(?<verb>.+) the (?<ingredient>.+)"},
-  {END, "(.+) the (?<ingredient>.+) until (?<verb>.+)"},
+  {END, "(.+) (the (?<ingredient>.+) )?until (?<verb>.+)"},
   {BREAK, "Set( aside)"}
 };
 
@@ -184,10 +184,10 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
       for(int i=0; i<ingred_count; i++) if(!strcmp(ings[i].name, curr)) step.ingredient = i;
     }
     if(!strcmp("bowl", tabptr + 2)){
-      if(0 >= sscanf(curr, "%d", &step.bowl)) step.bowl = 0;
+      if(0 >= sscanf(curr, "%d", &step.bowl)) step.bowl = 1;
     }
     if(!strcmp("dish", tabptr + 2)){
-      if(0 >= sscanf(curr, "%d", &step.val)) step.val = 0;
+      if(0 >= sscanf(curr, "%d", &step.val)) step.val = 1;
     }
     if(!strcmp("minutes", tabptr + 2)){
       if(0 >= sscanf(curr, "%d", &step.val)) step.val = 0;
@@ -223,6 +223,8 @@ struct Recipe parse(const char *fname){
 
   // Get title
   fgets2(recipe.title, 256, file);
+  if(recipe.title[strlen(recipe.title)-1] == '.')
+    recipe.title[strlen(recipe.title)-1] = '\0';
 
   // Skip everything after the title and before the ingredients
   while(strcmp(fgets2(line, 256, file), "Ingredients."));
@@ -238,11 +240,22 @@ struct Recipe parse(const char *fname){
 
   // Read method one sentence at a time until
   setupParses();
-  for(int i=0; i<16; i++){
+  recipe.step_count = 0;
+  char c;
+  // read until whitespace followed by newline peeked
+  while('\n' != ungetc(getc(file), file)){
+    // read next step
     readUntil(line, 256, '.', file);
-    skipSpaces(file);
-    recipe.steps[i] = strToStep(recipe.ingredients, recipe.ingred_count, line);
+    // parse line
+    recipe.steps[recipe.step_count++] = strToStep(recipe.ingredients, recipe.ingred_count, line);
+    // delete next character if it's a space or newline
+    if(!isspace(c = getc(file))) ungetc(c, file);
   }
+  getc(file);
+
+  // Parse "serves" line
+  fgets2(line, 256, file);
+  sscanf(line, "Serves %d.", &recipe.serves);
   cleanupParses();
 
   return recipe;

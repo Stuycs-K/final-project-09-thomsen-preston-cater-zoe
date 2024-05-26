@@ -48,7 +48,9 @@ struct Recipe {
   char title[256];
   int ingred_count;
   struct Ingredient ingredients[64];
-  struct Step steps[64];
+  int step_count;
+  struct Step steps[128];
+  int serves;
 };
 
 void printIngredient(struct Ingredient ing);

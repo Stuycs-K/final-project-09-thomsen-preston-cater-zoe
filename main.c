@@ -12,13 +12,13 @@ int main(int argc, char *argv[]) {
     struct Recipe recipe = parse(filename);
 
     // Print Recipe details for debugging purposes
-    printf("%s\n", recipe.title);
+    printf("%s: %d servings\n", recipe.title, recipe.serves);
     for(int i=0; i<recipe.ingred_count; i++){
         printIngredient(recipe.ingredients[i]);
     }
     printf("\n");
     printStepHeaders();
-    for(int i=0; i<16; i++){
+    for(int i=0; i<recipe.step_count; i++){
         printStep(recipe.ingredients, recipe.steps[i]);
     }
 }
