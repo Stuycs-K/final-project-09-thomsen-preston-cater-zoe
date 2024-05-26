@@ -91,8 +91,6 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   step.val = -1;
   strcpy(step.string, "");
 
-  char *pattern;
-
   struct CommandParse parses[19] = {
     {INPUT, "Take .+"},
     {PUSH, "Put (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
@@ -115,89 +113,42 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
     {WHILE, ".+"}
   };
 
-  if(hasPrefix(str, "Take ")){
-    step.command = INPUT;
-  } else if(hasPrefix(str, "Put ")){
-    step.command = PUSH;
-    pattern = "Put (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl";
-  } else if(hasPrefix(str, "Fold ")){
-    step.command = POP;
-  } else if(hasPrefix(str, "Add ")){
-    step.command = ADD;
-    pattern = "Add (?<ingredient>.+) to (the |(?<bowl>.+)th )?mixing bowl";
-  } else if(hasPrefix(str, "Remove ")){
-    step.command = SUBTRACT;
-    pattern = "Remove (?<ingredient>.+) from (the |(?<bowl>.+)th )?mixing bowl";
-  } else if(hasPrefix(str, "Combine ")){
-    step.command = MULTIPLY;
-  } else if(hasPrefix(str, "Divide ")){
-    step.command = DIVIDE;
-  } else if(hasPrefix(str, "Add dry ")){
-    step.command = ADD_MANY;
-  } else if(hasPrefix(str, "Liquefy contents ")){
-    step.command = GLYPH_MANY;
-    pattern = "Liquefy contents of (the |(?<bowl>.+)th )?mixing bowl";
-  } else if(hasPrefix(str, "Liquefy ")){
-    step.command = GLYPH;
-  } else if(hasPrefix(str, "Stir ")){
-    step.command = PUSHDOWN;
-  } else if(hasPrefix(str, "Stir ")){ // not working
-    step.command = PUSHDOWN_CONST;
-  } else if(hasPrefix(str, "Mix ")){
-    step.command = RANDOMIZE;
-  } else if(hasPrefix(str, "Clean ")){
-    step.command = CLEAN;
-  } else if(hasPrefix(str, "Pour ")){
-    step.command = PRINT;
-    pattern = "Pour contents of (the |(?<bowl>.+)th )?mixing bowl into (the |(?<dish>.+)th )?baking dish";
-  } else if(!strcmp(str, "Set aside")){
-    step.command = END;
-  } else if(hasPrefix(str, "Serve with ")){
-    step.command = SUBROUTINE;
-  } else if(hasPrefix(str, "Refrigerate ")){
-    step.command = RETURN;
-  } else{
-    step.command = WHILE;
-  }
-
   int errornumber;
   PCRE2_SIZE erroroffset;
   PCRE2_SPTR name_table;
   int namecount;
   int name_entry_size;
 
-  pcre2_code *re = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
-  if(re == NULL) printf("compilation error\n");
-
   pcre2_code *res[19];
-  for(int i=0; i<19; i++){
-  res[i] = pcre2_compile((PCRE2_SPTR) pattern, PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
-  if(res[i] == NULL) printf("compilation error\n");
-  }
-
-  pcre2_match_data *match_data = pcre2_match_data_create_from_pattern(re, NULL);
-  int rc = pcre2_match(re, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, match_data, NULL);
-  PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
-  if (rc < 0) printf("matching error %d\n", rc);
-
   pcre2_match_data *matches[19];
-  PCRE2_SIZE *ovectors[19];
   for(int i=0; i<19; i++){
+    res[i] = pcre2_compile((PCRE2_SPTR) (parses[i].pattern), PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
+    if(res[i] == NULL) printf("compilation error\n");
     matches[i] = pcre2_match_data_create_from_pattern(res[i], NULL);
-    int rc = pcre2_match(res[i], str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, matches[i], NULL);
-    ovectors[i] = pcre2_get_ovector_pointer(matches[i]);
-    if (rc < 0) printf("matching error %d\n", rc);
   }
 
-  pcre2_pattern_info(re, PCRE2_INFO_NAMECOUNT, &namecount);
-  pcre2_pattern_info(re, PCRE2_INFO_NAMEENTRYSIZE, &name_entry_size);
-  pcre2_pattern_info(re, PCRE2_INFO_NAMETABLE, &name_table);
+  PCRE2_SIZE *ovector2;
+  int real;
+  for(real=0; real<19; real++){
+    int rc = pcre2_match(res[real], str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, matches[real], NULL);
+    if (rc > 0) {
+      ovector2 = pcre2_get_ovector_pointer(matches[real]);
+      break;
+    }
+  }
+
+  step.command = parses[real].command;
+
+  pcre2_pattern_info(res[real], PCRE2_INFO_NAMECOUNT, &namecount);
+  pcre2_pattern_info(res[real], PCRE2_INFO_NAMEENTRYSIZE, &name_entry_size);
+  pcre2_pattern_info(res[real], PCRE2_INFO_NAMETABLE, &name_table);
   PCRE2_SPTR tabptr = name_table;
 
   for (int i = 0; i < namecount; i++) {
     int n = (tabptr[0] << 8) | tabptr[1]; // capture group number
-    char *curr = str + ovector[2*n];
-    str[ovector[2*n+1]]  ='\0';
+    char *curr = str + ovector2[2*n];
+    str[ovector2[2*n+1]]  ='\0';
+    printf("%s: %s\n", tabptr+2, curr);
 
     if(!strcmp("ingredient", tabptr + 2)){
       for(int i=0; i<ingred_count; i++) if(!strcmp(ings[i].name, curr)) step.ingredient = i;
@@ -212,8 +163,8 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
     tabptr += name_entry_size;
   }
 
-  pcre2_match_data_free(match_data);
-  pcre2_code_free(re);
+  //pcre2_match_data_free(match_data);
+  //pcre2_code_free(re);
   for(int i=0; i<19; i++){
     pcre2_match_data_free(matches[i]);
     pcre2_code_free(res[i]);
