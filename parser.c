@@ -3,7 +3,6 @@
 #include <string.h> // strncmp, strlen, strchr, strncpy, strcspn
 #include <stdbool.h> // bool, true, false
 #include <ctype.h>  // isspace
-#include <regex.h>
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 #include "parser.h" // Ingredient, Recipe
@@ -15,11 +14,30 @@ bool hasPrefix(const char *str, const char *pre){
 void printIngredient(struct Ingredient ing){
     printf("%ld\t%s\t%s\n", ing.count, (char*[]){"DRY", "WET", "???"}[ing.state], ing.name);
 }
+
+void printStepHeaders(){
+  printf("%-12s", "command name");
+  printf("\tbowl#");
+  printf("\t%-16s", "ingredient name");
+  printf("\t%s", "val");
+  printf("\t%s", "string");
+  printf("\n");
+}
+
+static char *commandNames[] = {"INPUT", "PUSH", "POP", "ADD", "ADD_MANY", "SUBTRACT", "MULTIPLY", "DIVIDE", "GLYPH", "GLYPH_MANY", "PUSHDOWN", "PUSHDOWN_CONST", "RANDOMIZE", "CLEAN", "PRINT", "WHILE", "END", "BREAK", "SUBROUTINE", "RETURN"};
 void printStep(struct Ingredient *ings, struct Step step){
-  printf("%-12s\tbowl_%d", bob[step.command], step.bowl);
-  printf("\t%-12s", step.ingredient == -1 ? "" : ings[step.ingredient].name);
-  printf("\t%d", step.val);
+  printf("%-12s", commandNames[step.command]);
+
+  if(step.bowl == -1) printf("\t");
+  else printf("\tbowl%d", step.bowl);
+
+  printf("\t%-16s", step.ingredient == -1 ? "" : ings[step.ingredient].name);
+
+  if(step.val == -1) printf("\t");
+  else printf("\t%d", step.val);
+
   if(step.string) printf("\t%s", step.string);
+
   printf("\n");
 }
 
@@ -112,7 +130,7 @@ void setupParses(){
   int errornumber;
   PCRE2_SIZE erroroffset;
   for(int i=0; i<20; i++){
-    parses[i].regex = pcre2_compile((PCRE2_SPTR) parses[i].pattern, PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
+    parses[i].regex = pcre2_compile((PCRE2_SPTR) parses[i].pattern, PCRE2_ZERO_TERMINATED, PCRE2_UNGREEDY, &errornumber, &erroroffset, NULL);
     if(parses[i].regex == NULL){
       PCRE2_UCHAR buffer[256];
       pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
