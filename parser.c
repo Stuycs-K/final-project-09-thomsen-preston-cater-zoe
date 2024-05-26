@@ -85,32 +85,33 @@ struct CommandParse {
   pcre2_match_data *matches;
 };
 
-struct CommandParse parses[19] = {
-  {INPUT, "Take .+"},
+struct CommandParse parses[20] = {
+  {INPUT, "Take (?<ingredient>.+) from (the )?refrigerator"},
   {PUSH, "Put (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
-  {POP, "Fold .+"},
-  {ADD_MANY, "Add dry .+"},
-  {ADD, "Add (?<ingredient>.+) to (the |(?<bowl>.+)th )?mixing bowl"},
-  {SUBTRACT, "Remove (?<ingredient>.+) from (the |(?<bowl>.+)th )?mixing bowl"},
-  {MULTIPLY, "Combine .+"},
-  {DIVIDE, "Divide .+"},
+  {POP, "Fold (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
+  {ADD_MANY, "Add dry ingredients( to (the |(?<bowl>.+)th )?mixing bowl)?"},
+  {ADD, "Add (?<ingredient>.+)( to (the |(?<bowl>.+)th )?mixing bowl)?"},
+  {SUBTRACT, "Remove (?<ingredient>.+)( from (the |(?<bowl>.+)th )?mixing bowl)?"},
+  {MULTIPLY, "Combine (?<ingredient>.+)( into (the |(?<bowl>.+)th )?mixing bowl)?"},
+  {DIVIDE, "Divide (?<ingredient>.+)( into (the |(?<bowl>.+)th )?mixing bowl)?"},
   {GLYPH_MANY, "Liquefy contents of (the |(?<bowl>.+)th )?mixing bowl"},
-  {GLYPH, "Liquefy .+"},
-  {PUSHDOWN, "Stir .+"},
-  {PUSHDOWN_CONST, "Stir .+"},
-  {RANDOMIZE, "Mix .+"},
-  {CLEAN, "Clean .+"},
+  {GLYPH, "Liquefy (?<ingredient>.+)"},
+  {PUSHDOWN_CONST, "Stir( (the |(?<bowl>.+)th )?mixing bowl)? for (?<minutes>.+) minutes.+"},
+  {PUSHDOWN, "Stir (?<ingredient>.+) into (the |(?<bowl>.+)th )?mixing bowl"},
+  {RANDOMIZE, "Mix( (the |(?<bowl>.+)th )?mixing bowl)? well"},
+  {CLEAN, "Clean (the |(?<bowl>.+)th )?mixing bowl"},
   {PRINT, "Pour contents of (the |(?<bowl>.+)th )?mixing bowl into (the |(?<dish>.+)th )?baking dish"},
-  {END, "Set aside"},
-  {SUBROUTINE, "Serve .+"},
-  {RETURN, "Refrigerate .+"},
-  {WHILE, ".+"}
+  {SUBROUTINE, "Serve with (?<recipe>.+)"},
+  {RETURN, "Refrigerate( for (?<hours>.+) hours)?"},
+  {WHILE, "(?<verb>.+) the (?<ingredient>.+)"},
+  {END, "(.+) the (?<ingredient>.+) until (?<verb>.+)"},
+  {BREAK, "Set( aside)"}
 };
 
 void setupParses(){
   int errornumber;
   PCRE2_SIZE erroroffset;
-  for(int i=0; i<19; i++){
+  for(int i=0; i<20; i++){
     parses[i].regex = pcre2_compile((PCRE2_SPTR) parses[i].pattern, PCRE2_ZERO_TERMINATED, 0, &errornumber, &erroroffset, NULL);
     if(parses[i].regex == NULL){
       PCRE2_UCHAR buffer[256];
@@ -122,7 +123,7 @@ void setupParses(){
 }
 
 void cleanupParses(){
-  for(int i=0; i<19; i++){
+  for(int i=0; i<20; i++){
     pcre2_code_free(parses[i].regex);
     pcre2_match_data_free(parses[i].matches);
   }
@@ -139,8 +140,9 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
 
   int matched;
   int rc;
-  for(matched=0; matched<19 && rc <= 0; matched++){
+  for(matched=0; matched<20; matched++){
     rc = pcre2_match(parses[matched].regex, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, parses[matched].matches, NULL);
+    if(rc > 0) break;
   }
   if(rc < 0) printf("No match found.");
 
@@ -168,6 +170,18 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
     }
     if(!strcmp("dish", tabptr + 2)){
       if(0 >= sscanf(curr, "%d", &step.val)) step.val = 0;
+    }
+    if(!strcmp("minutes", tabptr + 2)){
+      if(0 >= sscanf(curr, "%d", &step.val)) step.val = 0;
+    }
+    if(!strcmp("hours", tabptr + 2)){
+      if(0 >= sscanf(curr, "%d", &step.val)) step.val = 0;
+    }
+    if(!strcmp("recipe", tabptr + 2)){
+      strcpy(step.string, curr);
+    }
+    if(!strcmp("verb", tabptr + 2)){
+      strcpy(step.string, curr);
     }
 
     tabptr += name_entry_size;
