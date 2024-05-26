@@ -35,49 +35,6 @@ char *trimSpaces(char *curr){
   return curr;
 }
 
-// -- Ingredient parsing functions
-
-// Read a single-line ingredient string as an Ingredient
-struct Ingredient strToIng(char *str){
-  struct Ingredient ing;
-  
-  // Parse ingredient count
-  char* text;
-  ing.count = strtol(str, &text, 10);
-  text = trimSpaces(text);
-  char* postcount = trimSpaces(strchr(text, ' '));
-
-  // Parse ingredient state and name
-  if(hasPrefix(text, "heaped ") || hasPrefix(text, "level ")){
-    ing.state = DRY;
-    strncpy(ing.name, trimSpaces(strchr(postcount, ' ')), 256);
-  }
-  else if(hasPrefix(text, "ml ")   || hasPrefix(text, "l ") ||
-          hasPrefix(text, "dash ") || hasPrefix(text, "dashes ")){
-    ing.state = LIQUID;
-    strncpy(ing.name, postcount, 256);
-  }
-  else if(hasPrefix(text, "g ")          || hasPrefix(text, "kg ") ||
-          hasPrefix(text, "pinch ")      || hasPrefix(text, "pinches ")){
-    ing.state = DRY;
-    strncpy(ing.name, postcount, 256);
-  }
-  else if(hasPrefix(text, "cup ")        || hasPrefix(text, "cups ") ||
-          hasPrefix(text, "teaspoon ")   || hasPrefix(text, "teaspoons ") ||
-          hasPrefix(text, "tablespoon ") || hasPrefix(text, "tablespoons ")){
-    ing.state = UNKNOWN;
-    strncpy(ing.name, postcount, 256);
-  }
-  else{
-    ing.state = UNKNOWN;
-    strncpy(ing.name, text, 256);
-  }
-
-  return ing;
-}
-
-// --- Step parsing functions
-
 // Helper struct to store commands and their associated patterns
 struct CommandParse {
   enum Command command;
@@ -87,8 +44,10 @@ struct CommandParse {
 };
 
 // Ordered array of command-pattern pairs: earlier indices have higher precedence
-#define PATTERN_COUNT 20
+// First pattern is only for ingredients
+#define PATTERN_COUNT 21
 struct CommandParse parses[PATTERN_COUNT] = {
+  {-1, "\\s*(\\d+)?\\s+(?:(?:(heaped|level)\\s+)?(g|kg|pinch(?:es)?|ml|l|dash(?:es)?|cups?|teaspoons?|tablespoons?)\\s+)?(.+)"},
   {INPUT, "Take (?<ingredient>.+) from (the )?refrigerator"},
   {PUSH, "Put (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
   {POP, "Fold (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
@@ -116,7 +75,8 @@ void setupParses(){
   int errornumber;
   PCRE2_SIZE erroroffset;
   for(int i=0; i<PATTERN_COUNT; i++){
-    parses[i].regex = pcre2_compile((PCRE2_SPTR) parses[i].pattern, PCRE2_ZERO_TERMINATED, PCRE2_UNGREEDY, &errornumber, &erroroffset, NULL);
+    uint32_t options = i ? PCRE2_UNGREEDY : 0;
+    parses[i].regex = pcre2_compile((PCRE2_SPTR) parses[i].pattern, PCRE2_ZERO_TERMINATED, options, &errornumber, &erroroffset, NULL);
     if(parses[i].regex == NULL){
       PCRE2_UCHAR buffer[256];
       pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
@@ -128,11 +88,50 @@ void setupParses(){
 
 // Run once: clean up all command regexes
 void cleanupParses(){
-  for(int i=0; i<20; i++){
+  for(int i=0; i<PATTERN_COUNT; i++){
     pcre2_code_free(parses[i].regex);
     pcre2_match_data_free(parses[i].matches);
   }
 }
+
+// -- Ingredient parsing functions
+
+// Read a single-line ingredient string as an Ingredient
+struct Ingredient strToIng(char *str){
+  struct Ingredient ing;
+  
+  int rc = pcre2_match(parses[0].regex, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, parses[0].matches, NULL);
+  if (rc < 0) printf("match error");
+  PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(parses[0].matches);
+
+  char *field[5];
+  for (int i = 1; i < rc; i++) {
+    field[i] = str + ovector[2*i];
+    str[ovector[2*i+1]] = '\0';
+  }
+
+  // How many of an ingredient
+  ing.count = strtol(field[1], NULL, 10);
+
+  // The state of an ingredient
+  if(!strcmp(field[2], "heaped") || !strcmp(field[2], "level") ||
+     !strcmp(field[3], "g") || !strcmp(field[3], "kg") || !strcmp(field[3], "cup")){
+    ing.state = DRY;
+  }
+  else if(!strcmp(field[3], "ml") || !strcmp(field[3], "l") || !strcmp(field[3], "dash")){
+    ing.state = LIQUID;
+  }
+  else{
+    ing.state = UNKNOWN;
+  }
+
+  // The name of an ingredient
+  strcpy(ing.name, field[4]);
+
+  return ing;
+}
+
+// --- Step parsing functions
 
 // Read a single string as a step
 struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
@@ -148,11 +147,13 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
   // Find matching regex
   int matched;
   int rc;
-  for(matched=0; matched<20; matched++){
+  // skip first pattern, it's only for ingredients
+  for(matched=1; matched<PATTERN_COUNT; matched++){
     rc = pcre2_match(parses[matched].regex, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, parses[matched].matches, NULL);
     if(rc > 0) break;
   }
-  if(rc < 0) printf("No match found."); // Really should throw an error here (malformed command)
+  // Really should throw an error here (malformed command)
+  if(rc < 0) printf("No match found.");
 
   // Store previously-calculated matches and associated command name
   step.command = parses[matched].command;
@@ -215,6 +216,8 @@ struct Recipe parse(const char *fname){
   struct Recipe recipe;
   char line[256];
 
+  setupParses();
+
   // Get title
   fgets2(recipe.title, 256, file);
   if(recipe.title[strlen(recipe.title)-1] == '.')
@@ -233,7 +236,6 @@ struct Recipe parse(const char *fname){
   while(strcmp(fgets2(line, 256, file), "Method."));
 
   // Read method one sentence at a time
-  setupParses();
   recipe.step_count = 0;
   char c;
   // read until whitespace followed by newline peeked
@@ -245,6 +247,7 @@ struct Recipe parse(const char *fname){
     // delete next character if it's a space or newline
     if(!isspace(c = getc(file))) ungetc(c, file);
   }
+
   cleanupParses();
 
   // Skip all blank lines
