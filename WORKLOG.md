@@ -24,6 +24,9 @@
 - Improved the worklog (by a lot)
 - Future goals: Handling of subroutines, actually moving through parsed steps and processing them, continue making the readme bigger and better and odder
 
+### 2024-05-27
+- Simplified ingredient struct and separated out name data—it's only technically necessary for debug printing and during the parsing process, and as such doesn't need to be carted around everywhere.
+
 ## Preston Thomsen
 
 ### 5/22/2024
