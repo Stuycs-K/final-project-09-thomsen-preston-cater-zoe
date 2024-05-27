@@ -18,6 +18,11 @@
 - Realized the unfeasibility of the previous method and switched to using PCRE2 regexes
 - Finished implementing most of the recipe parsing using PCRE2 regexes (still need to handle the last few lines and see about going back to the previous sections with the new parsing setup)
 
+### 2024-05-26
+- Handled the last few lines of parsing and went back to the previous sections with the new parsing setup (as promised)
+- Split parser out into parser and types files
+- Improved the worklog (by a lot)
+- Future goals: Handling of subroutines, actually moving through parsed steps and processing them, continue making the readme bigger and better and odder
 
 ## Preston Thomsen
 
