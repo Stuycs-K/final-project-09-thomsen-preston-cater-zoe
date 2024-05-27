@@ -1,10 +1,10 @@
-#include <stdio.h>  // FILE, fgets, fopen
+#include <stdio.h>  // FILE, fgets, fopen, fclose
 #include <stdlib.h> // strol
-#include <string.h> // strncmp, strlen, strchr, strncpy, strcspn
+#include <string.h> // strncmp, strlen, strcpy, strcspn
 #include <ctype.h>  // isspace
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
-#include "types.h" // Ingredient, Recipe
+#include "types.h" // Ingredient, Recipe, 128
 #include "parser.h"
 
 // --- Utility functions
@@ -97,7 +97,7 @@ void cleanupParses(){
 // -- Ingredient parsing functions
 
 // Read a single-line ingredient string as an Ingredient
-struct Ingredient strToIng(char *str){
+struct Ingredient strToIng(char *str, char name[128]){
   struct Ingredient ing;
   
   int rc = pcre2_match(parses[0].regex, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, parses[0].matches, NULL);
@@ -126,7 +126,7 @@ struct Ingredient strToIng(char *str){
   }
 
   // The name of an ingredient
-  strcpy(ing.name, field[4]);
+  strcpy(name, field[4]);
 
   return ing;
 }
@@ -134,7 +134,7 @@ struct Ingredient strToIng(char *str){
 // --- Step parsing functions
 
 // Read a single string as a step
-struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
+struct Step strToStep(char names[][128], int ingred_count, char *str){
   // Default values
   struct Step step = {
     .command = -1,
@@ -176,7 +176,7 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
 
     // Ingredient: find index of ingredient in ingredient list and save
     if(!strcmp("ingredient", tabptr + 2)){
-      for(int i=0; i<ingred_count; i++) if(!strcmp(ings[i].name, curr)) step.ingredient = i;
+      for(int i=0; i<ingred_count; i++) if(!strcmp(names[i], curr)) step.ingredient = i;
     }
     // Bowl: parse number, otherwise default to 1
     else if(!strcmp("bowl", tabptr + 2)){
@@ -211,7 +211,7 @@ struct Step strToStep(struct Ingredient* ings, int ingred_count, char *str){
 }
 
 // Takes a filename and parses the file as a recipe
-struct Recipe parse(const char *fname){
+struct Recipe parse(const char *fname, char names[][128]){
   FILE *file = fopen(fname, "r");
   struct Recipe recipe;
   char line[256];
@@ -219,7 +219,7 @@ struct Recipe parse(const char *fname){
   setupParses();
 
   // Get title
-  fgets2(recipe.title, 256, file);
+  fgets2(recipe.title, 128, file);
   if(recipe.title[strlen(recipe.title)-1] == '.')
     recipe.title[strlen(recipe.title)-1] = '\0';
 
@@ -229,7 +229,8 @@ struct Recipe parse(const char *fname){
   // Read ingredients one line at a time until the next blank line
   recipe.ingred_count = 0;
   while(strcmp(fgets2(line, 256, file), "")){
-    recipe.ingredients[recipe.ingred_count++] = strToIng(line);
+    recipe.ingredients[recipe.ingred_count] = strToIng(line, names[recipe.ingred_count]);
+    recipe.ingred_count++;
   }
 
   // Skip everything after the ingredients and before the method
@@ -243,12 +244,10 @@ struct Recipe parse(const char *fname){
     // read next step
     readUntil(line, 256, '.', file);
     // parse line
-    recipe.steps[recipe.step_count++] = strToStep(recipe.ingredients, recipe.ingred_count, line);
+    recipe.steps[recipe.step_count++] = strToStep(names, recipe.ingred_count, line);
     // delete next character if it's a space or newline
     if(!isspace(c = getc(file))) ungetc(c, file);
   }
-
-  cleanupParses();
 
   // Skip all blank lines
   while(!strcmp(fgets2(line, 256, file), ""));
@@ -257,6 +256,9 @@ struct Recipe parse(const char *fname){
   sscanf(line, "Serves %d.", &recipe.serves);
 
   // Work needed: parse subroutines
+
+  cleanupParses();
+  fclose(file);
 
   return recipe;
 }

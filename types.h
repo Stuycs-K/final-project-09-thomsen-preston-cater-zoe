@@ -8,7 +8,6 @@ enum State {
 };
 
 struct Ingredient {
-  char name[256];
   enum State state;
   long count;
 };
@@ -41,11 +40,11 @@ struct Step {
   int ingredient;
   int bowl;
   int val;
-  char string[256];
+  char string[128];
 };
 
 struct Recipe {
-  char title[256];
+  char title[128];
   int ingred_count;
   struct Ingredient ingredients[64];
   int step_count;
@@ -53,8 +52,8 @@ struct Recipe {
   int serves;
 };
 
-void printIngredient(struct Ingredient ing);
+void printIngredient(struct Ingredient ing, char *name);
 void printStepHeaders();
-void printStep(struct Ingredient *ings, struct Step step);
+void printStep(char names[][128], struct Step step);
 
 #endif // TYPES_H
