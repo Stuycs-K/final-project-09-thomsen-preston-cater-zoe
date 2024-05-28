@@ -4,17 +4,8 @@
 #include <time.h> // for the randomization function
 #include "stack.h" // Implementation of stacks into C
 
-struct StackNode { //This is the struct for each node of the stack, which references the next node in the stack
-  double data;
-  struct StackNode* next;
-};
-
-struct Stack { //This is to refer to each individual stack as a whole, all it needs is the top node.
-  struct StackNode* top;
-};
-
 struct Stack* createStack() {
-  Stack* stack = malloc(sizeof(Stack));
+  struct Stack* stack = malloc(sizeof(Stack));
   stack->top = NULL;
   return stack;
 }
@@ -26,20 +17,20 @@ void deleteStack(struct Stack* stack) {
   free(stack);
 }
 
-StackNode* createStackNode(double ingredient) {
-  StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
+struct StackNode* createStackNode(struct Ingredient ingredient) {
+  struct StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
   newNode->data = ingredient;
   newNode->next = NULL;
   return newNode;
 }
 
-int push(struct Stack* stack, double ingredient) {
+int push(struct Stack* stack, struct Ingredient ingredient) {
   StackNode* newNode = createStackNode(ingredient);
   newNode->next = stack->top;
   stack->top = newNode;
 }
 
-void pushNSpacesDown(struct Stack* stack, double ingredient, int n) {
+void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n) {
   if (n == 0) {
     push(stack, ingredient);
     return;
@@ -59,7 +50,7 @@ void pushNSpacesDown(struct Stack* stack, double ingredient, int n) {
   current->next = newNode;
 }
 
-double pop(struct Stack* stack) {
+struct Ingredient pop(struct Stack* stack) {
   StackNode* temp = stack->top;
   double poppedData = temp->data;
   stack->top = temp->next;
@@ -67,7 +58,7 @@ double pop(struct Stack* stack) {
   return poppedData;
 }
 
-double peek(struct Stack* stack) {
+struct Ingredient peek(struct Stack* stack) {
   return stack->top->data;
 }
 

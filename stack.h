@@ -1,8 +1,10 @@
 #ifndef STACK_H
 #define STACK_H
 
+#include "types.h" //For the struct ingredient
+
 struct StackNode { //This is the struct for each node of the stack, which references the next node in the stack
-    double data;
+    struct Ingredient data;
     struct StackNode* next;
 };
 
@@ -13,8 +15,8 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
 struct Stack* createStack();
 int push(struct Stack* stack, double ingredient);
 void pushNSpacesDown(struct Stack* stack, double ingredient, int n); //Unique to the chef language I believe
-double pop(struct Stack* stack); //Returns the data of node that is popped.
-double peek(struct Stack* stack);
+struct Ingredient pop(struct Stack* stack); //Returns the data of node that is popped.
+struct Ingredient peek(struct Stack* stack);
 int countElements(struct Stack* stack);
 void randomizeStack(struct Stack* stack);
 
