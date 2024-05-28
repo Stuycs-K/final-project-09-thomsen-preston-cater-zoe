@@ -23,39 +23,39 @@ int main(int argc, char *argv[]) {
 
     // Testing stack implementation
     struct Stack* tester = createStack();
-    struct Ingredient holdingOne = {DRY, 11.11};
-    struct Ingredient holdingTwo = {DRY, 22.22};
-    struct Ingredient holdingThree = {DRY, 33.33};
-    struct Ingredient holdingFour = {DRY, 44.44};
+    struct Ingredient holdingOne = {DRY, 11111};
+    struct Ingredient holdingTwo = {DRY, 22222};
+    struct Ingredient holdingThree = {DRY, 33333};
+    struct Ingredient holdingFour = {DRY, 44444};
 
-    push(tester, 11.11);
-    push(tester, 22.22);
-    push(tester, 33.33);
-    push(tester, 44.44);
-    printf("%f \n", peek(tester));
+    push(tester, holdingOne);
+    push(tester, holdingTwo);
+    push(tester, holdingThree);
+    push(tester, holdingFour);
+    printf("%f \n", peek(tester).count);
     pop(tester);
-    printf("%f \n", peek(tester));
+    printf("%f \n", peek(tester).count);
     pop(tester);
-    printf("%f \n", peek(tester));
+    printf("%f \n", peek(tester).count);
     pop(tester);
-    printf("%f \n", peek(tester));
+    printf("%f \n", peek(tester).count);
     pop(tester);
 
-    push(tester, 11.11);
-    push(tester, 22.22);
-    push(tester, 33.33);
-    push(tester, 44.44);
-    pushNspacesDown(tester, 55.55, 2);
-    printf("%f \n", peek(tester));
-    pop(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
+    // push(tester, 11.11);
+    // push(tester, 22.22);
+    // push(tester, 33.33);
+    // push(tester, 44.44);
+    // pushNspacesDown(tester, 55.55, 2);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
 
     // Now test randomizaiton function
     // push(tester, 11.11);
