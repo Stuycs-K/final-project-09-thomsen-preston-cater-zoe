@@ -2,6 +2,7 @@
 #include "parser.h" // parse
 #include "types.h" // Recipe, debug printing, 128
 #include "stack.h"
+#include "execute.h"
 
 int main(int argc, char *argv[]) {
     char *filename = argv[1];
@@ -22,4 +23,7 @@ int main(int argc, char *argv[]) {
     for(int i=0; i<recipe.step_count; i++){
         printStep(names, recipe.steps[i]);
     }
+
+    printf("\n");
+    execute(recipe);
 }
