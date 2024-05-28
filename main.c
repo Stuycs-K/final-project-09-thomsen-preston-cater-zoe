@@ -32,13 +32,13 @@ int main(int argc, char *argv[]) {
     push(tester, holdingTwo);
     push(tester, holdingThree);
     push(tester, holdingFour);
-    printf("%f \n", peek(tester).count);
+    printf("%ld \n", peek(tester).count);
     pop(tester);
-    printf("%f \n", peek(tester).count);
+    printf("%ld \n", peek(tester).count);
     pop(tester);
-    printf("%f \n", peek(tester).count);
+    printf("%ld \n", peek(tester).count);
     pop(tester);
-    printf("%f \n", peek(tester).count);
+    printf("%ld \n", peek(tester).count);
     pop(tester);
 
     // push(tester, 11.11);

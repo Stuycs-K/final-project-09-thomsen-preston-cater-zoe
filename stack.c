@@ -18,7 +18,7 @@ void deleteStack(struct Stack* stack) {
 }
 
 struct StackNode* createStackNode(struct Ingredient ingredient) {
-  struct StackNode* newNode = malloc(sizeof(StackNode));
+  struct StackNode* newNode = malloc(sizeof(struct StackNode));
   newNode->data = ingredient;
   newNode->next = NULL;
   return newNode;
@@ -45,7 +45,7 @@ void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n) {
     current = current->next;
   }
 
-  StackNode* newNode = createStackNode(ingredient);
+  struct StackNode* newNode = createStackNode(ingredient);
   newNode->next = current->next;
   current->next = newNode;
 }
