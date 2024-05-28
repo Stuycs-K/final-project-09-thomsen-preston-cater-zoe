@@ -1,17 +1,20 @@
 .PHONY: run compile clean
-ARGS=recipes/souffle.chef
+ARGS=recipes/opposition.chef
 
 run: main
 	./main $(ARGS)
 
-compile main: main.o parser.o
-	gcc -Wall -Werror -o main main.o parser.o
+compile main: main.o parser.o types.o
+	gcc -Wall -Werror -fsanitize=address,undefined -o main main.o parser.o types.o -lpcre2-8 
 
-main.o: main.c parser.c parser.h
+main.o: main.c parser.c parser.h types.c types.h
 	gcc -c main.c
 
-parser.o: parser.c parser.h
+parser.o: parser.c parser.h types.c types.h
 	gcc -c parser.c
+
+types.o: types.c types.h
+	gcc -c types.c
 
 clean:
 	rm -f main *.o

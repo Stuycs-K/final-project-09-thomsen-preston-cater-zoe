@@ -7,10 +7,25 @@
 - Added some basic files (makefile, gitignore) and set up workspace.
 - Spent ages implementing first half of recipe parsing (reading titles and ingredient lists).
 
-### date y
+### 2024-05-23
 
-info
+- Made ingredient parsing much more robust, less prone to breaking on multi-word ingredients
+- Outlined the enums and structs needed for parsing the list of steps
 
+### 2024-05-25
+
+- Implemented the parsing of five commands using POSIX regexes as a proof of concept
+- Realized the unfeasibility of the previous method and switched to using PCRE2 regexes
+- Finished implementing most of the recipe parsing using PCRE2 regexes (still need to handle the last few lines and see about going back to the previous sections with the new parsing setup)
+
+### 2024-05-26
+- Handled the last few lines of parsing and went back to the previous sections with the new parsing setup (as promised)
+- Split parser out into parser and types files
+- Improved the worklog (by a lot)
+- Future goals: Handling of subroutines, actually moving through parsed steps and processing them, continue making the readme bigger and better and odder
+
+### 2024-05-27
+- Simplified ingredient struct and separated out name data—it's only technically necessary for debug printing and during the parsing process, and as such doesn't need to be carted around everywhere.
 
 ## Preston Thomsen
 
