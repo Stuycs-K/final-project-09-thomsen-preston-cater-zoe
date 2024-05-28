@@ -23,6 +23,11 @@ int main(int argc, char *argv[]) {
 
     // Testing stack implementation
     struct Stack* tester = createStack();
+    struct Ingredient holdingOne = {DRY, 11.11};
+    struct Ingredient holdingTwo = {DRY, 22.22};
+    struct Ingredient holdingThree = {DRY, 33.33};
+    struct Ingredient holdingFour = {DRY, 44.44};
+
     push(tester, 11.11);
     push(tester, 22.22);
     push(tester, 33.33);
@@ -53,18 +58,18 @@ int main(int argc, char *argv[]) {
     pop(tester);
 
     // Now test randomizaiton function
-    push(tester, 11.11);
-    push(tester, 22.22);
-    push(tester, 33.33);
-    push(tester, 44.44);
-    randomizeStack(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
-    printf("%f \n", peek(tester));
-    pop(tester);
+    // push(tester, 11.11);
+    // push(tester, 22.22);
+    // push(tester, 33.33);
+    // push(tester, 44.44);
+    // randomizeStack(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
+    // printf("%f \n", peek(tester));
+    // pop(tester);
 
 }

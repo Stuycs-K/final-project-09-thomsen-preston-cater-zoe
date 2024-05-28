@@ -5,27 +5,27 @@
 #include "stack.h" // Implementation of stacks into C
 
 struct Stack* createStack() {
-  struct Stack* stack = malloc(sizeof(Stack));
+  struct Stack* stack = malloc(sizeof(struct Stack));
   stack->top = NULL;
   return stack;
 }
 
 void deleteStack(struct Stack* stack) {
-  while (!isEmpty(stack)) {
+  while (countElements(stack) != 0) {
     pop(stack);
   }
   free(stack);
 }
 
 struct StackNode* createStackNode(struct Ingredient ingredient) {
-  struct StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
+  struct StackNode* newNode = malloc(sizeof(StackNode));
   newNode->data = ingredient;
   newNode->next = NULL;
   return newNode;
 }
 
-int push(struct Stack* stack, struct Ingredient ingredient) {
-  StackNode* newNode = createStackNode(ingredient);
+void push(struct Stack* stack, struct Ingredient ingredient) {
+  struct StackNode* newNode = createStackNode(ingredient);
   newNode->next = stack->top;
   stack->top = newNode;
 }
@@ -36,7 +36,7 @@ void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n) {
     return;
   }
 
-  StackNode* current = stack->top;
+  struct StackNode* current = stack->top;
   for (int i = 0; i < n - 1; i++) {
     if (current == NULL) {
       fprintf(stderr, "Stack does not have %d elements\n", n);
@@ -71,7 +71,7 @@ int countElements(struct Stack* stack) {
 double* getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
   double* elements = (double*)malloc(countElements(stack));
 
-  StackNode* current = stack->top;
+  struct StackNode* current = stack->top;
   for (int i = 0; i < count; i++) {
     elements[i] = current->data;
     current = current->next;

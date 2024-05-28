@@ -13,7 +13,7 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
 };
 
 struct Stack* createStack();
-int push(struct Stack* stack, double ingredient);
+void push(struct Stack* stack, struct Ingredient ingredient);
 void pushNSpacesDown(struct Stack* stack, double ingredient, int n); //Unique to the chef language I believe
 struct Ingredient pop(struct Stack* stack); //Returns the data of node that is popped.
 struct Ingredient peek(struct Stack* stack);
