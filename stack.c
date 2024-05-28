@@ -51,8 +51,8 @@ void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n) {
 }
 
 struct Ingredient pop(struct Stack* stack) {
-  StackNode* temp = stack->top;
-  double poppedData = temp->data;
+  struct StackNode* temp = stack->top;
+  struct Ingredient poppedData = temp->data;
   stack->top = temp->next;
   free(temp);
   return poppedData;
@@ -64,7 +64,7 @@ struct Ingredient peek(struct Stack* stack) {
 
 int countElements(struct Stack* stack) {
   int count = 0;
-  StackNode* current = stack->top;
+  struct StackNode* current = stack->top;
   return count;
 }
 
