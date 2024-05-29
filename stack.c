@@ -68,8 +68,8 @@ int countElements(struct Stack* stack) {
   return count;
 }
 
-double* getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
-  double* elements = (double*)malloc(countElements(stack));
+struct Ingredient[] getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
+  struct Ingredient elements[100];
 
   struct StackNode* current = stack->top;
   for (int i = 0; i < count; i++) {
