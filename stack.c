@@ -20,20 +20,20 @@ int intcountElements(struct intStack* stack) {
 
 void intDeleteStack(struct intStack* stack) {
   while (intcountElements(stack) != 0) {
-    intpop(stack);
+    intPop(stack);
   }
   free(stack);
 }
 
 struct intStackNode* intCreateStackNode(int ingredient) {
-  struct StackNode* newNode = malloc(sizeof(struct StackNode));
+  struct intStackNode* newNode = malloc(sizeof(struct StackNode));
   newNode->data = ingredient;
   newNode->next = NULL;
   return newNode;
 }
 
 void intPush(struct intStack* stack, int ingredient) {
-  struct intStackNode* newNode = createStackNode(ingredient);
+  struct intStackNode* newNode = intCreateStackNode(ingredient);
   newNode->next = stack->top;
   stack->top = newNode;
 }
@@ -116,15 +116,13 @@ struct Ingredient peek(struct Stack* stack) {
   return stack->top->data;
 }
 
-struct Ingredient[] getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
-  struct Ingredient elements[100];
+void getStackElements(struct Stack* stack, int count, struct Ingredient elements[100]) { // This function makes the stack into an array which can be rearranged (more easily)
 
   struct StackNode* current = stack->top;
   for (int i = 0; i < count; i++) {
     elements[i] = current->data;
     current = current->next;
   }
-  return elements;
 }
 
 void randomizeStack(struct Stack* stack) {
@@ -133,13 +131,14 @@ void randomizeStack(struct Stack* stack) {
     return; // No need to randomize if there are less than 2 (because then there's only one)
   }
 
-  double* elements = getStackElements(stack, count);
+  struct Ingredient elements[100];
+  getStackElements(stack, count, elements);
 
   // Shuffle the elements array
   srand(time(NULL));
   for (int i = count - 1; i > 0; i--) {
     int j = rand() % (i + 1);
-    double temp = elements[i];
+    struct Ingredient temp = elements[i];
     elements[i] = elements[j];
     elements[j] = temp;
   }
@@ -150,6 +149,4 @@ void randomizeStack(struct Stack* stack) {
   for (int i = 0; i < count; i++) {
     push(stack, elements[i]);
   }
-
-  free(elements);
 }

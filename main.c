@@ -40,36 +40,44 @@ int main(int argc, char *argv[]) {
     pop(tester);
     printf("%ld \n", peek(tester).count);
     pop(tester);
+    deleteStack(tester);
 
-    // push(tester, 11.11);
-    // push(tester, 22.22);
-    // push(tester, 33.33);
-    // push(tester, 44.44);
-    // pushNspacesDown(tester, 55.55, 2);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
+
+    tester = createStack();
+    push(tester, holdingOne);
+    push(tester, holdingTwo);
+    push(tester, holdingThree);
+    push(tester, holdingFour);
+    pushNSpacesDown(tester, holdingOne, 2);
+    printf("\n");
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    deleteStack(tester);
 
     // Now test randomizaiton function
-    // push(tester, 11.11);
-    // push(tester, 22.22);
-    // push(tester, 33.33);
-    // push(tester, 44.44);
-    // randomizeStack(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
-    // printf("%f \n", peek(tester));
-    // pop(tester);
+    tester = createStack();
+    push(tester, holdingOne);
+    push(tester, holdingTwo);
+    push(tester, holdingThree);
+    push(tester, holdingFour);
+    randomizeStack(tester);
+    printf("\n");
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    printf("%ld \n", peek(tester).count);
+    pop(tester);
+    deleteStack(tester);
 
 }

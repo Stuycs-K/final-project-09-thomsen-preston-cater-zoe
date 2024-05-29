@@ -33,6 +33,7 @@ int intPeek(struct intStack* stack);
 
 //Actual chef stack stuff
 struct Stack* createStack();
+void deleteStack(struct Stack* stack);
 void push(struct Stack* stack, struct Ingredient ingredient);
 void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n); //Unique to the chef language I believe
 struct Ingredient pop(struct Stack* stack); //Returns the data of node that is popped.
