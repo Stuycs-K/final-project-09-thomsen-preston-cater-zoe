@@ -4,6 +4,48 @@
 #include <time.h> // for the randomization function
 #include "stack.h" // Implementation of stacks into C
 
+//THIS IS ALL FOR THE INT STACKS THAT ARE ONLY FOR LOOPING AND ITERATION
+
+struct intStack* intCreateStack() {
+  struct intStack* stack = malloc(sizeof(struct intStack));
+  stack->top = NULL;
+  return stack;
+}
+
+void intDeleteStack(struct intStack* stack) {
+  while (countElements(stack) != 0) {
+    pop(stack);
+  }
+  free(stack);
+}
+
+struct intStackNode* intCreateStackNode(int ingredient) {
+  struct StackNode* newNode = malloc(sizeof(struct StackNode));
+  newNode->data = ingredient;
+  newNode->next = NULL;
+  return newNode;
+}
+
+void intPush(struct intStack* stack, int ingredient) {
+  struct intStackNode* newNode = createStackNode(ingredient);
+  newNode->next = stack->top;
+  stack->top = newNode;
+}
+
+int intPop(struct intStack* stack) {
+  struct intStackNode* temp = stack->top;
+  int poppedData = temp->data;
+  stack->top = temp->next;
+  free(temp);
+  return poppedData;
+}
+
+int intPeek(struct intStack* stack) {
+  return stack->top->data;
+}
+
+//THIS IS ALL FOR REGULAR STACKS
+
 struct Stack* createStack() {
   struct Stack* stack = malloc(sizeof(struct Stack));
   stack->top = NULL;
