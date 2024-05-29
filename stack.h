@@ -15,12 +15,23 @@ struct Stack { //This is to refer to each individual stack as a whole, all it ne
 struct intStackNode {
     int data;
     struct intStackNode* next;
-}
+};
 
 struct intStack {
     struct intStackNode* top;
-}
+};
 
+
+//Int stack stuff
+struct intStack* intCreateStack();
+int intcountElements(struct intStack* stack);
+void intDeleteStack(struct intStack* stack);
+struct intStackNode* intCreateStackNode(int ingredient);
+void intPush(struct intStack* stack, int ingredient);
+int intPop(struct intStack* stack);
+int intPeek(struct intStack* stack);
+
+//Actual chef stack stuff
 struct Stack* createStack();
 void push(struct Stack* stack, struct Ingredient ingredient);
 void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n); //Unique to the chef language I believe

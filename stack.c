@@ -12,9 +12,15 @@ struct intStack* intCreateStack() {
   return stack;
 }
 
+int intcountElements(struct intStack* stack) {
+  int count = 0;
+  struct intStackNode* current = stack->top;
+  return count;
+}
+
 void intDeleteStack(struct intStack* stack) {
-  while (countElements(stack) != 0) {
-    pop(stack);
+  while (intcountElements(stack) != 0) {
+    intpop(stack);
   }
   free(stack);
 }
@@ -50,6 +56,12 @@ struct Stack* createStack() {
   struct Stack* stack = malloc(sizeof(struct Stack));
   stack->top = NULL;
   return stack;
+}
+
+int countElements(struct Stack* stack) {
+  int count = 0;
+  struct StackNode* current = stack->top;
+  return count;
 }
 
 void deleteStack(struct Stack* stack) {
@@ -102,12 +114,6 @@ struct Ingredient pop(struct Stack* stack) {
 
 struct Ingredient peek(struct Stack* stack) {
   return stack->top->data;
-}
-
-int countElements(struct Stack* stack) {
-  int count = 0;
-  struct StackNode* current = stack->top;
-  return count;
 }
 
 struct Ingredient[] getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
