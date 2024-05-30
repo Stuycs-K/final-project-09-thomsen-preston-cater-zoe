@@ -127,28 +127,35 @@ void getStackElements(struct Stack* stack, int count, struct Ingredient elements
   }
 }
 
-void randomizeStack(struct Stack* stack) {
+void randomizeStack(Stack* stack) {
   int count = countElements(stack);
   if (count < 2) {
-    return; // No need to randomize if there are less than 2 (because then there's only one)
+    return; // No need to randomize if the stack has less than 2 elements
   }
 
-  struct Ingredient elements[100];
-  getStackElements(stack, count, elements);
+  // Pop all elements into an array
+  double* elements = (double*)malloc(count * sizeof(double));
+  if (!elements) {
+    fprintf(stderr, "Memory allocation failed\n");
+    exit(EXIT_FAILURE);
+  }
+  for (int i = 0; i < count; i++) {
+    elements[i] = pop(stack);
+  }
 
-  // Shuffle the elements array
+  // Shuffle the array
   srand(time(NULL));
   for (int i = count - 1; i > 0; i--) {
     int j = rand() % (i + 1);
-    struct Ingredient temp = elements[i];
+    double temp = elements[i];
     elements[i] = elements[j];
     elements[j] = temp;
   }
 
-  // Rebuild the stack with the shuffled elements
-  deleteStack(stack);
-  stack = createStack();
+  // Push the shuffled elements back onto the stack
   for (int i = 0; i < count; i++) {
     push(stack, elements[i]);
   }
+
+  free(elements);
 }
