@@ -16,7 +16,7 @@ parser.o: parser.c parser.h types.c types.h
 types.o: types.c types.h
 	gcc -c types.c
 
-execute.o: execute.c execute.h types.c types.h
+execute.o: execute.c execute.h types.c types.h stack.c stack.h
 	gcc -c execute.c
 
 stack.o: stack.c stack.h types.c types.h

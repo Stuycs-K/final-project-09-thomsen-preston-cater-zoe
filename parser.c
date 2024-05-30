@@ -47,6 +47,7 @@ struct CommandParse {
 // First pattern is only for ingredients
 #define PATTERN_COUNT 21
 struct CommandParse parses[PATTERN_COUNT] = {
+  // error: "dashes" does not parse as liquid
   {-1, "\\s*(\\d+)?\\s+(?:(?:(heaped|level)\\s+)?(g|kg|pinch(?:es)?|ml|l|dash(?:es)?|cups?|teaspoons?|tablespoons?)\\s+)?(.+)"},
   {INPUT, "Take (?<ingredient>.+) from (the )?refrigerator"},
   {PUSH, "Put (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
