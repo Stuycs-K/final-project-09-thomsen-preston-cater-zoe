@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
 
     printf("\n---\n\n");
 
+    /*
     // Testing stack implementation
     srand(time(NULL)); //Prepare for randomization shennanigans.
 
@@ -90,4 +91,5 @@ int main(int argc, char *argv[]) {
     printf("%ld \n", peek(tester).count);
     pop(tester);
     deleteStack(tester);
+    */
 }

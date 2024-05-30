@@ -7,12 +7,13 @@ void execute(struct Recipe recipe){
 
   printf("---executing:---\n");
 
-  struct Stack* bowl1 = createStack();
-  struct Stack* pan1 = createStack();
+  struct Stack *bowls[] = {createStack()};
+  struct Stack *pan[] = {createStack()};
 
   for(int iptr=0; iptr<recipe.step_count; iptr++){
     struct Step *curr = recipe.steps + iptr;
     struct Ingredient *ing = &(recipe.ingredients[curr->ingredient]);
+    struct Stack *bowl = bowls[curr->bowl-1]; // doesn't break on bowl==-1 but
 
     switch(curr->command){
       case INPUT:
@@ -23,36 +24,34 @@ void execute(struct Recipe recipe){
 
       case PUSH:
         // printf("pushing\n");
-        push(bowl1, *ing);
+        push(bowl, *ing);
         break;
 
       case POP:
         // printf("popping\n");
+        pop(bowl);
         break;
 
       case ADD:
-        // printf("adding\n");
+      case SUBTRACT:
+      case MULTIPLY:
+      case DIVIDE:
+        // printf("subtracting\n");
+        struct Ingredient tempArithmetic = pop(bowl);
+        if(curr->command == ADD)      tempArithmetic.count += ing->count;
+        if(curr->command == SUBTRACT) tempArithmetic.count -= ing->count;
+        if(curr->command == MULTIPLY) tempArithmetic.count *= ing->count;
+        if(curr->command == DIVIDE)   tempArithmetic.count /= ing->count;
+        push(bowl, tempArithmetic);
         break;
 
       case ADD_MANY:
         // printf("adding many\n");
         break;
 
-      case SUBTRACT:
-        // printf("subtracting\n");
-        break;
-
-      case MULTIPLY:
-        // printf("multiplying\n");
-        break;
-
-      case DIVIDE:
-        // printf("dividing\n");
-        break;
-
       case GLYPH_MANY:
         // printf("glyphing many\n");
-        for(struct StackNode* ptr = bowl1->top; ptr; ptr = ptr->next){
+        for(struct StackNode* ptr = bowl->top; ptr; ptr = ptr->next){
           ptr->data.state = LIQUID;          
         }
         break;
@@ -74,15 +73,15 @@ void execute(struct Recipe recipe){
         // printf("printing\n");
         // reads from bowl1 into temp and then from temp into pan1
         // this preserves the order
-        struct Stack* temp = createStack();
-        for(struct StackNode *ptr = bowl1->top; ptr; ptr = ptr->next){
-          push(temp, ptr->data);
+        struct Stack* tempStack = createStack();
+        for(struct StackNode *ptr = bowl->top; ptr; ptr = ptr->next){
+          push(tempStack, ptr->data);
         }
-        for(struct StackNode *ptr = temp->top; ptr; ptr = ptr->next){
-          push(pan1, ptr->data);
+        for(struct StackNode *ptr = tempStack->top; ptr; ptr = ptr->next){
+          push(pan[curr->val-1], ptr->data);
         }
-        while(temp->top) pop(temp);
-        deleteStack(temp);
+        while(tempStack->top) pop(tempStack);
+        deleteStack(tempStack);
         break;
 
       case WHILE:
@@ -111,13 +110,17 @@ void execute(struct Recipe recipe){
     }
   }
 
-  while(pan1->top){
-    struct Ingredient toPrint = pop(pan1);
-    if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
-    else printf(" %ld ", toPrint.count);
+  for(int i=0; i<1; i++){
+    while(pan[i]->top){
+      struct Ingredient toPrint = pop(pan[i]);
+      if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
+      else printf(" %ld ", toPrint.count);
+    }
+    deleteStack(pan[0]);
   }
-  deleteStack(pan1);
-  while(bowl1->top) pop(bowl1);
-  deleteStack(bowl1);
+  for(int i=0; i<1; i++){
+    while(bowls[0]->top) pop(bowls[0]);
+    deleteStack(bowls[0]);
+  }
 
 }
