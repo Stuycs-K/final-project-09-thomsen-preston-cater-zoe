@@ -65,7 +65,7 @@ int countElements(struct Stack* stack) {
 }
 
 void deleteStack(struct Stack* stack) {
-  while (countElements(stack) != 0) {
+  while (stack->top) {
     pop(stack);
   }
   free(stack);
