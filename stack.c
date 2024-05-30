@@ -1,48 +1,152 @@
 #include <stdio.h>  // FILE, fgets, fopen, printf
 #include <stdlib.h> // strol
 #include <string.h> // strncmp, strlen, strchr, strncpy, strcspn
+#include <time.h> // for the randomization function
 #include "stack.h" // Implementation of stacks into C
 
-struct StackNode { //This is the struct for each node of the stack, which references the next node in the stack
-    double data;
-    struct StackNode* next;
-};
+//THIS IS ALL FOR THE INT STACKS THAT ARE ONLY FOR LOOPING AND ITERATION
 
-struct Stack { //This is to refer to each individual stack as a whole, all it needs is the top node.
-    StackNode* top;
-};
-
-Stack* createStack() {
-    Stack* stack = (Stack*)malloc(sizeof(Stack));
-    stack->top = NULL;
-    return stack;
+struct intStack* intCreateStack() {
+  struct intStack* stack = malloc(sizeof(struct intStack));
+  stack->top = NULL;
+  return stack;
 }
 
-StackNode* createStackNode(double data) {
-    StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
-    newNode->data = data;
-    newNode->next = NULL;
-    return newNode;
+int intcountElements(struct intStack* stack) {
+  int count = 0;
+  struct intStackNode* current = stack->top;
+  return count;
 }
 
-int push(Stack* stack, double ingredient) {
-  StackNode* newNode = createStackNode(ingredient);
+void intDeleteStack(struct intStack* stack) {
+  while (intcountElements(stack) != 0) {
+    intPop(stack);
+  }
+  free(stack);
+}
+
+struct intStackNode* intCreateStackNode(int ingredient) {
+  struct intStackNode* newNode = malloc(sizeof(struct StackNode));
+  newNode->data = ingredient;
+  newNode->next = NULL;
+  return newNode;
+}
+
+void intPush(struct intStack* stack, int ingredient) {
+  struct intStackNode* newNode = intCreateStackNode(ingredient);
   newNode->next = stack->top;
   stack->top = newNode;
 }
 
-double pop(Stack* stack) {
-  StackNode* temp = stack->top;
-  double poppedData = temp->data;
+int intPop(struct intStack* stack) {
+  struct intStackNode* temp = stack->top;
+  int poppedData = temp->data;
   stack->top = temp->next;
   free(temp);
   return poppedData;
 }
 
-double peek(Stack* stack) {
+int intPeek(struct intStack* stack) {
   return stack->top->data;
 }
 
-int isEmpty(Stack* stack) {
-    return stack->top == NULL;
+//THIS IS ALL FOR REGULAR STACKS
+
+struct Stack* createStack() {
+  struct Stack* stack = malloc(sizeof(struct Stack));
+  stack->top = NULL;
+  return stack;
+}
+
+int countElements(struct Stack* stack) {
+  int count = 0;
+  struct StackNode* current = stack->top;
+  return count;
+}
+
+void deleteStack(struct Stack* stack) {
+  while (countElements(stack) != 0) {
+    pop(stack);
+  }
+  free(stack);
+}
+
+struct StackNode* createStackNode(struct Ingredient ingredient) {
+  struct StackNode* newNode = malloc(sizeof(struct StackNode));
+  newNode->data = ingredient;
+  newNode->next = NULL;
+  return newNode;
+}
+
+void push(struct Stack* stack, struct Ingredient ingredient) {
+  struct StackNode* newNode = createStackNode(ingredient);
+  newNode->next = stack->top;
+  stack->top = newNode;
+}
+
+void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n) {
+  if (n == 0) {
+    push(stack, ingredient);
+    return;
+  }
+
+  struct StackNode* current = stack->top;
+  for (int i = 0; i < n - 1; i++) {
+    if (current == NULL) {
+      fprintf(stderr, "Stack does not have %d elements\n", n);
+      exit(EXIT_FAILURE);
+    }
+    current = current->next;
+  }
+
+  struct StackNode* newNode = createStackNode(ingredient);
+  newNode->next = current->next;
+  current->next = newNode;
+}
+
+struct Ingredient pop(struct Stack* stack) {
+  struct StackNode* temp = stack->top;
+  struct Ingredient poppedData = temp->data;
+  stack->top = temp->next;
+  free(temp);
+  return poppedData;
+}
+
+struct Ingredient peek(struct Stack* stack) {
+  return stack->top->data;
+}
+
+void getStackElements(struct Stack* stack, int count, struct Ingredient elements[100]) { // This function makes the stack into an array which can be rearranged (more easily)
+
+  struct StackNode* current = stack->top;
+  for (int i = 0; i < count; i++) {
+    elements[i] = current->data;
+    current = current->next;
+  }
+}
+
+void randomizeStack(struct Stack* stack) {
+  int count = countElements(stack);
+  if (count < 2) {
+    return; // No need to randomize if there are less than 2 (because then there's only one)
+  }
+
+  struct Ingredient elements[100];
+  getStackElements(stack, count, elements);
+
+  // Shuffle the elements array
+  srand(time(NULL));
+  for (int i = count - 1; i > 0; i--) {
+    int j = rand() % (i + 1);
+    struct Ingredient temp = elements[i];
+    elements[i] = elements[j];
+    elements[j] = temp;
+  }
+
+  // Rebuild the stack with the shuffled elements
+  deleteStack(stack);
+  stack = createStack();
+  for (int i = 0; i < count; i++) {
+    push(stack, elements[i]);
+  }
 }
