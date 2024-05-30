@@ -68,7 +68,7 @@ int countElements(struct Stack* stack) {
   return count;
 }
 
-struct Ingredient[] getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
+struct Ingredient* getStackElements(struct Stack* stack, int count) { // This function makes the stack into an array which can be rearranged (more easily)
   struct Ingredient elements[100];
 
   struct StackNode* current = stack->top;
