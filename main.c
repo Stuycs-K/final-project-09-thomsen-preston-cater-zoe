@@ -58,8 +58,6 @@ int main(int argc, char *argv[]) {
     pop(tester);
     printf("%ld \n", peek(tester).count);
     pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
     deleteStack(tester);
 
     // Now test randomizaiton function
