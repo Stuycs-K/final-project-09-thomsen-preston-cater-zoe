@@ -69,8 +69,8 @@ void execute(struct Recipe recipe){
         break;
 
       case RANDOMIZE:
-        // printf("randomizing\n");
-        // randomizeStack(bowl);
+        printf("randomizing\n");
+        randomizeStack(bowl);
         break;
 
       case CLEAN:

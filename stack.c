@@ -129,7 +129,6 @@ void getStackElements(struct Stack* stack, int count, struct Ingredient elements
   }
 }
 
-/*
 void randomizeStack(struct Stack* stack) {
   int count = countElements(stack);
   if (count < 2) {
@@ -137,7 +136,7 @@ void randomizeStack(struct Stack* stack) {
   }
 
   // Pop all elements into an array
-  struct Stack elements[] = malloc(count * sizeof(struct Stack));
+  struct Ingredient elements[100];
   if (!elements) {
     fprintf(stderr, "Memory allocation failed\n");
     exit(EXIT_FAILURE);
@@ -149,7 +148,7 @@ void randomizeStack(struct Stack* stack) {
   // Shuffle the array
   for (int i = count - 1; i > 0; i--) {
     int j = rand() % (i + 1);
-    struct Stack temp = elements[i];
+    struct Ingredient temp = elements[i];
     elements[i] = elements[j];
     elements[j] = temp;
   }
@@ -158,7 +157,4 @@ void randomizeStack(struct Stack* stack) {
   for (int i = 0; i < count; i++) {
     push(stack, elements[i]);
   }
-
-  free(elements);
 }
-*/
