@@ -127,7 +127,7 @@ void getStackElements(struct Stack* stack, int count, struct Ingredient elements
   }
 }
 
-void randomizeStack(Stack* stack) {
+void randomizeStack(struct Stack* stack) {
   int count = countElements(stack);
   if (count < 2) {
     return; // No need to randomize if the stack has less than 2 elements
