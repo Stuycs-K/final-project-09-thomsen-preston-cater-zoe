@@ -33,59 +33,59 @@ int main(int argc, char *argv[]) {
     // Testing stack implementation
     srand(time(NULL)); //Prepare for randomization shennanigans.
 
-    struct Stack* tester = createStack();
-    struct Ingredient holdingOne = {DRY, 11111};
-    struct Ingredient holdingTwo = {DRY, 22222};
-    struct Ingredient holdingThree = {DRY, 33333};
-    struct Ingredient holdingFour = {DRY, 44444};
+    // struct Stack* tester = createStack();
+    // struct Ingredient holdingOne = {DRY, 11111};
+    // struct Ingredient holdingTwo = {DRY, 22222};
+    // struct Ingredient holdingThree = {DRY, 33333};
+    // struct Ingredient holdingFour = {DRY, 44444};
 
-    push(tester, holdingOne);
-    push(tester, holdingTwo);
-    push(tester, holdingThree);
-    push(tester, holdingFour);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    deleteStack(tester);
+    // push(tester, holdingOne);
+    // push(tester, holdingTwo);
+    // push(tester, holdingThree);
+    // push(tester, holdingFour);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // deleteStack(tester);
 
 
-    tester = createStack();
-    push(tester, holdingOne);
-    push(tester, holdingTwo);
-    push(tester, holdingThree);
-    push(tester, holdingFour);
-    pushNSpacesDown(tester, 1);
-    printf("\n");
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    deleteStack(tester);
+    // tester = createStack();
+    // push(tester, holdingOne);
+    // push(tester, holdingTwo);
+    // push(tester, holdingThree);
+    // push(tester, holdingFour);
+    // pushNSpacesDown(tester, 1);
+    // printf("\n");
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // deleteStack(tester);
 
-    // Now test randomizaiton function
-    tester = createStack();
-    push(tester, holdingOne);
-    push(tester, holdingTwo);
-    push(tester, holdingThree);
-    push(tester, holdingFour);
-    randomizeStack(tester);
-    printf("\n");
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    printf("%ld \n", peek(tester).count);
-    pop(tester);
-    deleteStack(tester);
+    // // Now test randomizaiton function
+    // tester = createStack();
+    // push(tester, holdingOne);
+    // push(tester, holdingTwo);
+    // push(tester, holdingThree);
+    // push(tester, holdingFour);
+    // randomizeStack(tester);
+    // printf("\n");
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // printf("%ld \n", peek(tester).count);
+    // pop(tester);
+    // deleteStack(tester);
 }

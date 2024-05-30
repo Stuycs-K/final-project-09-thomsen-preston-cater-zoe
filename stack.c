@@ -60,7 +60,9 @@ struct Stack* createStack() {
 
 int countElements(struct Stack* stack) {
   int count = 0;
-  struct StackNode* current = stack->top;
+  for (struct StackNode* holding = stack->top; holding; holding = holding->next) {
+    count++;
+  }
   return count;
 }
 
@@ -134,7 +136,7 @@ void randomizeStack(struct Stack* stack) {
   }
 
   // Pop all elements into an array
-  struct Stack elements[] = malloc(count * sizeof(double));
+  struct Stack elements[] = malloc(count * sizeof(struct Stack));
   if (!elements) {
     fprintf(stderr, "Memory allocation failed\n");
     exit(EXIT_FAILURE);
@@ -144,10 +146,9 @@ void randomizeStack(struct Stack* stack) {
   }
 
   // Shuffle the array
-  srand(time(NULL));
   for (int i = count - 1; i > 0; i--) {
     int j = rand() % (i + 1);
-    double temp = elements[i];
+    struct Stack temp = elements[i];
     elements[i] = elements[j];
     elements[j] = temp;
   }
