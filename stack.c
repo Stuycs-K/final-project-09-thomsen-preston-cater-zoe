@@ -127,6 +127,7 @@ void getStackElements(struct Stack* stack, int count, struct Ingredient elements
   }
 }
 
+/*
 void randomizeStack(struct Stack* stack) {
   int count = countElements(stack);
   if (count < 2) {
@@ -159,3 +160,4 @@ void randomizeStack(struct Stack* stack) {
 
   free(elements);
 }
+*/
