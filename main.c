@@ -4,24 +4,35 @@
 #include <time.h> // for the randomization function
 #include "parser.h" // Recipe, printIngredient, parse
 #include "stack.h"
+#include "execute.h"
 
 int main(int argc, char *argv[]) {
 
-    srand(time(NULL)); //Prepare for randomization shennanigans.
+    //We will have status changes come after the file which is being modified so that it is easier to incorporate new things as we get to it
+    char *filename = argv[1];
 
-    // char *filename = argv[1];
-    // //We will have status changes come after the file which is being modified so that it is easier to incorporate new things as we get to it
+    // Parse file as Recipe
+    char names[64][128];
+    struct Recipe recipe = parse(filename, names);
 
-    // // Parse file as Recipe
-    // struct Recipe recipe = parse(filename);
+    //Print Recipe details for debugging purposes
+    printf("%s\n", recipe.title);
+    for(int i=0; i<recipe.ingred_count; i++){
+        printIngredient(recipe.ingredients[i], names[i]);
+    }
+    printStepHeaders();
+    for(int i=0; i<recipe.step_count; i++){
+        printStep(names, recipe.steps[i]);
+    }
 
-    // // Print Recipe details for debugging purposes
-    // printf("%s\n", recipe.title);
-    // for(int i=0; i<recipe.ingred_count; i++){
-    //     printIngredient(recipe.ingredients[i]);
-    // }
+    printf("\n");
+    execute(recipe);
+
+    printf("\n---\n\n");
 
     // Testing stack implementation
+    srand(time(NULL)); //Prepare for randomization shennanigans.
+
     struct Stack* tester = createStack();
     struct Ingredient holdingOne = {DRY, 11111};
     struct Ingredient holdingTwo = {DRY, 22222};
@@ -77,5 +88,4 @@ int main(int argc, char *argv[]) {
     printf("%ld \n", peek(tester).count);
     pop(tester);
     deleteStack(tester);
-
 }

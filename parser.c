@@ -65,8 +65,8 @@ struct CommandParse parses[PATTERN_COUNT] = {
   {PRINT, "Pour contents of (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl into (the |(?<dish>.+)(st|nd|rd|th) )?baking dish"},
   {SUBROUTINE, "Serve with (?<recipe>.+)"},
   {RETURN, "Refrigerate( for (?<hours>.+) hours)?"},
-  {WHILE, "(?<verb>.+) the (?<ingredient>.+)"},
   {END, "(.+) (the (?<ingredient>.+) )?until (?<verb>.+)"},
+  {WHILE, "(?<verb>.+) the (?<ingredient>.+)"},
   {BREAK, "Set( aside)"}
 };
 
