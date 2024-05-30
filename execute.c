@@ -7,8 +7,8 @@ void execute(struct Recipe recipe){
 
   printf("---executing:---\n");
 
-  struct Stack *bowls[] = {createStack()};
-  struct Stack *pan[] = {createStack()};
+  struct Stack *bowls[] = {createStack(), createStack()};
+  struct Stack *pan[] = {createStack(), createStack()};
 
   for(int iptr=0; iptr<recipe.step_count; iptr++){
     struct Step *curr = recipe.steps + iptr;
@@ -17,7 +17,6 @@ void execute(struct Recipe recipe){
 
     switch(curr->command){
       case INPUT:
-        // printf("inputting\n");
         printf("Input requested.\n> ");
         scanf("%ld", &(ing->count));
         break;
@@ -29,7 +28,9 @@ void execute(struct Recipe recipe){
 
       case POP:
         // printf("popping\n");
-        pop(bowl);
+        struct Ingredient tempPopped = pop(bowl);
+        ing->state = tempPopped.state;
+        ing->count = tempPopped.count;
         break;
 
       case ADD:
@@ -47,6 +48,12 @@ void execute(struct Recipe recipe){
 
       case ADD_MANY:
         // printf("adding many\n");
+        long sum = 0;
+        for(int i=0; i<recipe.ingred_count; i++){
+          struct Ingredient tempIngr = recipe.ingredients[i];
+          if (DRY == tempIngr.state) sum += tempIngr.count; 
+        }
+        push(bowl, (struct Ingredient) {DRY, sum});
         break;
 
       case GLYPH_MANY:
@@ -63,10 +70,12 @@ void execute(struct Recipe recipe){
 
       case RANDOMIZE:
         // printf("randomizing\n");
+        randomizeStack(bowl);
         break;
 
       case CLEAN:
         // printf("cleaning\n");
+        while(bowl->top) pop(bowl);
         break;
 
       case PRINT:
@@ -110,17 +119,19 @@ void execute(struct Recipe recipe){
     }
   }
 
-  for(int i=0; i<1; i++){
+  printf("---\n");
+
+  for(int i=0; i<2; i++){
     while(pan[i]->top){
       struct Ingredient toPrint = pop(pan[i]);
       if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
-      else printf(" %ld ", toPrint.count);
+      else printf("%ld", toPrint.count);
     }
-    deleteStack(pan[0]);
+    deleteStack(pan[i]);
   }
-  for(int i=0; i<1; i++){
-    while(bowls[0]->top) pop(bowls[0]);
-    deleteStack(bowls[0]);
+  for(int i=0; i<2; i++){
+    while(bowls[i]->top) pop(bowls[i]);
+    deleteStack(bowls[i]);
   }
 
 }
