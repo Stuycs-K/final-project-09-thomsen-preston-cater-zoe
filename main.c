@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     push(tester, holdingTwo);
     push(tester, holdingThree);
     push(tester, holdingFour);
-    pushNSpacesDown(tester, holdingOne, 2);
+    pushNSpacesDown(tester, 2);
     printf("\n");
     printf("%ld \n", peek(tester).count);
     pop(tester);

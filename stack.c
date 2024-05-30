@@ -84,24 +84,26 @@ void push(struct Stack* stack, struct Ingredient ingredient) {
   stack->top = newNode;
 }
 
-void pushNSpacesDown(struct Stack* stack, struct Ingredient ingredient, int n) {
+void pushNSpacesDown(struct Stack* stack, int n) {
   if (n == 0) {
-    push(stack, ingredient);
     return;
   }
 
+  struct StackNode* topNode = stack->top;
+  stack->top = topNode->next;
+  topNode->next = NULL;
+
   struct StackNode* current = stack->top;
   for (int i = 0; i < n - 1; i++) {
-    if (current == NULL) {
-      fprintf(stderr, "Stack does not have %d elements\n", n);
-      exit(EXIT_FAILURE);
-    }
-    current = current->next;
+      if (current == NULL) {
+        fprintf(stderr, "Stack does not have %d elements\n", n);
+        exit(EXIT_FAILURE);
+      }
+      current = current->next;
   }
 
-  struct StackNode* newNode = createStackNode(ingredient);
-  newNode->next = current->next;
-  current->next = newNode;
+  topNode->next = current->next;
+  current->next = topNode;
 }
 
 struct Ingredient pop(struct Stack* stack) {
