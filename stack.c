@@ -134,7 +134,7 @@ void randomizeStack(struct Stack* stack) {
   }
 
   // Pop all elements into an array
-  double* elements = (double*)malloc(count * sizeof(double));
+  struct Stack elements[] = (double*)malloc(count * sizeof(double));
   if (!elements) {
     fprintf(stderr, "Memory allocation failed\n");
     exit(EXIT_FAILURE);
