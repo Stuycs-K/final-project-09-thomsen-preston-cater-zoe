@@ -121,6 +121,14 @@ void execute(struct Recipe recipe){
 
       case RETURN:
         // printf("returning\n");
+        for(int i=0; i<curr->val; i++){
+          while(pan[i]->top){
+            struct Ingredient toPrint = pop(pan[i]);
+            if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
+            else printf("%ld", toPrint.count);
+          }
+        }
+        iptr = recipe.step_count;
         break;
 
       default:
@@ -129,21 +137,19 @@ void execute(struct Recipe recipe){
     }
   }
 
-  printf("---\n");
+  printf("\n---\n");
 
-  for(int i=0; i<2; i++){
+  for(int i=0; i<recipe.serves; i++){
     while(pan[i]->top){
       struct Ingredient toPrint = pop(pan[i]);
       if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
       else printf("%ld", toPrint.count);
     }
-    deleteStack(pan[i]);
-  }
-  for(int i=0; i<2; i++){
-    while(bowls[i]->top) pop(bowls[i]);
-    deleteStack(bowls[i]);
   }
 
+  // Cleanup
+  for(int i=0; i<2; i++) deleteStack(bowls[i]);
+  for(int i=0; i<2; i++) deleteStack(pan[i]);
   intDeleteStack(jumps);
 
 }
