@@ -9,6 +9,7 @@ void execute(struct Recipe recipe){
 
   struct Stack *bowls[] = {createStack(), createStack()};
   struct Stack *pan[] = {createStack(), createStack()};
+  struct intStack *jumps = intCreateStack();
 
   for(int iptr=0; iptr<recipe.step_count; iptr++){
     struct Step *curr = recipe.steps + iptr;
@@ -68,6 +69,14 @@ void execute(struct Recipe recipe){
         ing->state = LIQUID;
         break;
 
+      case PUSHDOWN_CONST:
+        pushNSpacesDown(bowl, curr->val);
+        break;
+
+      case PUSHDOWN:
+        pushNSpacesDown(bowl, ing->count);
+        break;
+
       case RANDOMIZE:
         printf("randomizing\n");
         randomizeStack(bowl);
@@ -95,14 +104,23 @@ void execute(struct Recipe recipe){
 
       case WHILE:
         // printf("whiling\n");
+        if(ing->count){
+          intPush(jumps, iptr);
+        }
+        else{
+          while(recipe.steps[iptr].command != END) iptr++;
+        }
         break;
 
       case END:
         // printf("ending\n");
+        if(curr->ingredient != -1) ing->count--;
+        iptr = intPop(jumps) - 1;
         break;
 
       case BREAK:
         // printf("breaking\n");
+        while(recipe.steps[iptr].command != END) iptr++;
         break;
 
       case SUBROUTINE:
@@ -111,6 +129,14 @@ void execute(struct Recipe recipe){
 
       case RETURN:
         // printf("returning\n");
+        for(int i=0; i<curr->val; i++){
+          while(pan[i]->top){
+            struct Ingredient toPrint = pop(pan[i]);
+            if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
+            else printf("%ld", toPrint.count);
+          }
+        }
+        iptr = recipe.step_count;
         break;
 
       default:
@@ -119,19 +145,19 @@ void execute(struct Recipe recipe){
     }
   }
 
-  printf("---\n");
+  printf("\n---\n");
 
-  for(int i=0; i<2; i++){
+  for(int i=0; i<recipe.serves; i++){
     while(pan[i]->top){
       struct Ingredient toPrint = pop(pan[i]);
       if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
       else printf("%ld", toPrint.count);
     }
-    deleteStack(pan[i]);
   }
-  for(int i=0; i<2; i++){
-    while(bowls[i]->top) pop(bowls[i]);
-    deleteStack(bowls[i]);
-  }
+
+  // Cleanup
+  for(int i=0; i<2; i++) deleteStack(bowls[i]);
+  for(int i=0; i<2; i++) deleteStack(pan[i]);
+  intDeleteStack(jumps);
 
 }

@@ -27,6 +27,15 @@
 ### 2024-05-27
 - Simplified ingredient struct and separated out name data—it's only technically necessary for debug printing and during the parsing process, and as such doesn't need to be carted around everywhere.
 
+### 2024-05-29
+- Started working on actually executing code, using a big switch-case statement
+- The Hello World Souffle completely functions for the first time
+- Implemented input, push, pop, arithmetic, add_many, glyph and glyph_many, randomize (but it doesn't work), clean, and print
+
+### 2024-05-30
+- Continued working on code execution and removing magic numbers
+- Implemented pushdown, looping, breaking, and early returns
+
 ## Preston Thomsen
 
 ### 5/22/2024
