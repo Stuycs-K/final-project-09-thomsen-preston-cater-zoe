@@ -69,6 +69,14 @@ void execute(struct Recipe recipe){
         ing->state = LIQUID;
         break;
 
+      case PUSHDOWN_CONST:
+        pushNSpacesDown(bowl, curr->val);
+        break;
+
+      case PUSHDOWN:
+        pushNSpacesDown(bowl, ing->count);
+        break;
+
       case RANDOMIZE:
         // printf("randomizing\n");
         // randomizeStack(bowl);
