@@ -9,6 +9,7 @@ void execute(struct Recipe recipe){
 
   struct Stack *bowls[] = {createStack(), createStack()};
   struct Stack *pan[] = {createStack(), createStack()};
+  struct intStack *jumps = intCreateStack();
 
   for(int iptr=0; iptr<recipe.step_count; iptr++){
     struct Step *curr = recipe.steps + iptr;
@@ -95,14 +96,23 @@ void execute(struct Recipe recipe){
 
       case WHILE:
         // printf("whiling\n");
+        if(ing->count){
+          intPush(jumps, iptr);
+        }
+        else{
+          while(recipe.steps[iptr].command != END) iptr++;
+        }
         break;
 
       case END:
         // printf("ending\n");
+        if(curr->ingredient != -1) ing->count--;
+        iptr = intPop(jumps) - 1;
         break;
 
       case BREAK:
         // printf("breaking\n");
+        while(recipe.steps[iptr].command != END) iptr++;
         break;
 
       case SUBROUTINE:
@@ -133,5 +143,7 @@ void execute(struct Recipe recipe){
     while(bowls[i]->top) pop(bowls[i]);
     deleteStack(bowls[i]);
   }
+
+  intDeleteStack(jumps);
 
 }
