@@ -90,6 +90,9 @@ void pushNSpacesDown(struct Stack* stack, int n) {
   if (n == 0) {
     return;
   }
+  if (n > countElements(stack)) {
+    n = countElements(stack);
+  }
 
   struct StackNode* topNode = stack->top;
   stack->top = topNode->next;
