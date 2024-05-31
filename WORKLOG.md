@@ -48,3 +48,26 @@
 - Implemented a dynamic stack system into C with stack.c and stack.h after much consideration over the merits of dynamic and static stack systems
 
 ### 5/24/2024
+
+- Implemented the unique commands for stacks that chef utilizes (Randomizing the stack and pushNSpacesDown)
+
+
+### 5/26/2024
+
+- Worked on debugging the many issues with the stack functions I implemented
+
+### 5/27/2024
+
+- Reworked other functions to actually function in the way they are supposed to (Fixed NSpacesDown to just push the top value down and not push a new value down for example)
+
+### 5/28/2024
+
+- Implemented the changes Zoe desired for stacks (With the Ingredient struct)
+
+### 5/29/2024
+
+- Worked to fix the randomize stack function which now does rearrange the stack but it is not random.
+
+### 5/31/2024
+
+- 
