@@ -144,16 +144,13 @@ void randomizeStack(struct Stack* stack) {
     fprintf(stderr, "Memory allocation failed\n");
     exit(EXIT_FAILURE);
   }
-  for (int i = 0; i < count; i++) {
-    elements[i] = pop(stack);
-  }
 
   // Shuffle the array
-  for (int i = countElements(stack) - 1; i > 0; i--) {
-    int index = rand() % (i + 1);
-    struct Ingredient temp = elements[i];
-    elements[i] = elements[index];
-    elements[index] = temp;
+  for (int i = count - 1; i > 0; i--) {
+    int index = i + rand() / (RAND_MAX / (count - i) + 1);
+    struct Ingredient* temp = &elements[index];
+    elements[index] = elements[i];
+    elements[i] = *temp;
   }
 
   // Push the shuffled elements back onto the stack
