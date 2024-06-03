@@ -146,11 +146,11 @@ void randomizeStack(struct Stack* stack) {
   }
 
   // Shuffle the array
-  for (int i = count - 1; i > 0; i--) {
-    int index = i + rand() / (RAND_MAX / (count - i) + 1);
-    struct Ingredient* temp = &elements[index];
-    elements[index] = elements[i];
-    elements[i] = *temp;
+  for (int i = 0; i < count - 1; i++) {
+    size_t j = i + rand() / (RAND_MAX / (count - i) + 1);
+    struct Ingredients t = elements[j];
+    elements[j] = elements[i];
+    elements[i] = t;
   }
 
   // Push the shuffled elements back onto the stack
