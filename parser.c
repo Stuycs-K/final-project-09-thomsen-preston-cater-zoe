@@ -59,7 +59,7 @@ struct CommandParse parses[PATTERN_COUNT] = {
   {DIVIDE, "Divide (?<ingredient>.+)( into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)?"},
   {GLYPH_MANY, "Liquefy contents of (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
   {GLYPH, "Liquefy (?<ingredient>.+)"},
-  {PUSHDOWN_CONST, "Stir( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? for (?<minutes>.+) minutes?.+"},
+  {PUSHDOWN_CONST, "Stir( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? for (?<minutes>.+) minutes?"},
   {PUSHDOWN, "Stir (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
   {RANDOMIZE, "Mix( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? well"},
   {CLEAN, "Clean (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},

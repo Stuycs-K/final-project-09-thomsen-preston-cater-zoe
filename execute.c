@@ -23,12 +23,10 @@ void execute(struct Recipe recipe){
         break;
 
       case PUSH:
-        // printf("pushing\n");
         push(bowl, *ing);
         break;
 
       case POP:
-        // printf("popping\n");
         struct Ingredient tempPopped = pop(bowl);
         ing->state = tempPopped.state;
         ing->count = tempPopped.count;
@@ -38,7 +36,6 @@ void execute(struct Recipe recipe){
       case SUBTRACT:
       case MULTIPLY:
       case DIVIDE:
-        // printf("subtracting\n");
         struct Ingredient tempArithmetic = pop(bowl);
         if(curr->command == ADD)      tempArithmetic.count += ing->count;
         if(curr->command == SUBTRACT) tempArithmetic.count -= ing->count;
@@ -48,7 +45,6 @@ void execute(struct Recipe recipe){
         break;
 
       case ADD_MANY:
-        // printf("adding many\n");
         long sum = 0;
         for(int i=0; i<recipe.ingred_count; i++){
           struct Ingredient tempIngr = recipe.ingredients[i];
@@ -58,14 +54,12 @@ void execute(struct Recipe recipe){
         break;
 
       case GLYPH_MANY:
-        // printf("glyphing many\n");
         for(struct StackNode* ptr = bowl->top; ptr; ptr = ptr->next){
           ptr->data.state = LIQUID;          
         }
         break;
 
       case GLYPH:
-        // printf("glyphing one\n");
         ing->state = LIQUID;
         break;
 
@@ -78,19 +72,14 @@ void execute(struct Recipe recipe){
         break;
 
       case RANDOMIZE:
-        printf("randomizing\n");
         randomizeStack(bowl);
         break;
 
       case CLEAN:
-        // printf("cleaning\n");
         while(bowl->top) pop(bowl);
         break;
 
       case PRINT:
-        // printf("printing\n");
-        // reads from bowl1 into temp and then from temp into pan1
-        // this preserves the order
         struct Stack* tempStack = createStack();
         for(struct StackNode *ptr = bowl->top; ptr; ptr = ptr->next){
           push(tempStack, ptr->data);
@@ -103,7 +92,6 @@ void execute(struct Recipe recipe){
         break;
 
       case WHILE:
-        // printf("whiling\n");
         if(ing->count){
           intPush(jumps, iptr);
         }
@@ -113,22 +101,19 @@ void execute(struct Recipe recipe){
         break;
 
       case END:
-        // printf("ending\n");
         if(curr->ingredient != -1) ing->count--;
         iptr = intPop(jumps) - 1;
         break;
 
       case BREAK:
-        // printf("breaking\n");
         while(recipe.steps[iptr].command != END) iptr++;
         break;
 
       case SUBROUTINE:
-        // printf("subroutining\n");
+        printf("subroutining\n");
         break;
 
       case RETURN:
-        // printf("returning\n");
         for(int i=0; i<curr->val; i++){
           while(pan[i]->top){
             struct Ingredient toPrint = pop(pan[i]);
