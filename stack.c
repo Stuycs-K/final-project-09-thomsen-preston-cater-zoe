@@ -151,7 +151,7 @@ void randomizeStack(struct Stack* stack) {
 
   // Shuffle the array
   for (int i = 0; i < count - 1; i++) {
-    int j = i + rand() / (RAND_MAX / (count - i) + 1);
+    int j = i + rand() % (count - i);
     struct Ingredient t = elements[j];
     elements[j] = elements[i];
     elements[i] = t;

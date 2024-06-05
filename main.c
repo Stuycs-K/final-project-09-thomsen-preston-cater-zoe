@@ -8,6 +8,8 @@
 
 int main(int argc, char *argv[]) {
 
+    srand(time(NULL));
+
     //We will have status changes come after the file which is being modified so that it is easier to incorporate new things as we get to it
     char *filename = argv[1];
 
@@ -31,8 +33,6 @@ int main(int argc, char *argv[]) {
     printf("\n---\n\n");
 
     // Testing stack implementation
-    srand(time(NULL)); //Prepare for randomization shennanigans.
-
     // struct Stack* tester = createStack();
     // struct Ingredient holdingOne = {DRY, 11111};
     // struct Ingredient holdingTwo = {DRY, 22222};
