@@ -13,21 +13,28 @@ int main(int argc, char *argv[]) {
 
     // Parse file as Recipe
     char names[64][128];
-    struct Recipe recipe = parse(filename, names);
+    struct Recipe recipes[5];
+    int recipe_count;
+    FILE *file = fopen(filename, "r");
+    for(recipe_count = 0; !feof(file); recipe_count++) recipes[recipe_count] = parse(file, names);
+    fclose(file);
+    //struct Recipe recipe = recipes[0];
 
     //Print Recipe details for debugging purposes
-    printf("%s\n", recipe.title);
-    for(int i=0; i<recipe.ingred_count; i++){
-        printIngredient(recipe.ingredients[i], names[i]);
-    }
-    printf("\n");
-    printStepHeaders();
-    for(int i=0; i<recipe.step_count; i++){
-        printStep(names, recipe.steps[i]);
+    for(int j=0; j<recipe_count; j++){
+      printf("\n=== %s ===\n", recipes[j].title);
+      for(int i=0; i<recipes[j].ingred_count; i++){
+          printIngredient(recipes[j].ingredients[i], names[i]);
+      }
+      printf("\n");
+      printStepHeaders();
+      for(int i=0; i<recipes[j].step_count; i++){
+          printStep(names, recipes[j].steps[i]);
+      }
     }
 
     printf("\n");
-    execute(recipe);
+    execute(recipes[0]);
 
     printf("\n---\n\n");
 
