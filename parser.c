@@ -136,6 +136,7 @@ struct Ingredient strToIng(char *str, char name[128]){
 
 // Read a single string as a step
 struct Step strToStep(char names[][128], int ingred_count, char *str){
+  //printf("%s\n", str);
   // Default values
   struct Step step = {
     .command = -1,

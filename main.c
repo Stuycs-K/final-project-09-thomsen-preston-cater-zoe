@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
     for(int j = 0; !feof(file); j++){
       recipes[recipe_count++] = parse(file, names);
-      printf("\n=== %s ===\n", recipes[j].title);
+      printf("\n=== %s (serves %d) ===\n", recipes[j].title, recipes[j].serves);
       for(int i=0; i<recipes[j].ingred_count; i++){
           printIngredient(recipes[j].ingredients[i], names[i]);
       }

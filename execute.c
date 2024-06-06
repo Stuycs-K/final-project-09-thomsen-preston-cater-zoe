@@ -4,6 +4,16 @@
 #include "stack.h"
 #include "execute.h"
 
+void printPans(struct Stack *pan[], int count){
+  for(int i=0; i<count; i++){
+    while(pan[i]->top){
+      struct Ingredient toPrint = pop(pan[i]);
+      if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
+      else printf(" %ld", toPrint.count);
+    }
+  }
+}
+
 void copyStackOnto(struct Stack *to, struct Stack *from){
   struct Stack* tempStack = createStack();
   for(struct StackNode *ptr = from->top; ptr; ptr = ptr->next){
@@ -16,10 +26,10 @@ void copyStackOnto(struct Stack *to, struct Stack *from){
   deleteStack(tempStack);
 }
 
-void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe recipe, struct Stack *bowls[], struct Stack *pan[], int firstStep){
+void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe recipe, struct Stack *bowls[], struct Stack *pan[]){
   struct intStack *jumps = intCreateStack();
 
-  for(int iptr=firstStep; iptr<recipe.step_count; iptr++){
+  for(int iptr=0; iptr<recipe.step_count; iptr++){
     struct Step *curr = recipe.steps + iptr;
     struct Ingredient *ing = &(recipe.ingredients[curr->ingredient]);
     struct Stack *bowl = bowls[curr->bowl-1]; // doesn't break on bowl==-1 but
@@ -113,16 +123,19 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
         for(int i=0; i<recipe_count; i++){
           if(!strcmp(recipes[i].title, curr->string)){
             //printf("%s\n", curr->string);
-            struct Stack *newBowls[] = {createStack(), createStack()};
-            struct Stack *newPans[] = {createStack(), createStack()};
-            for(int i=0; i<2; i++){
+            struct Stack *newBowls[20];
+            struct Stack *newPans[20];
+            for(int i=0; i<20; i++){
+              newBowls[i] = createStack();
+              newPans[i] = createStack();
               copyStackOnto(newBowls[i], bowls[i]);
               copyStackOnto(newPans[i], pan[i]);
             }
-            executeHelper(recipe_count, recipes, recipes[i], newBowls, newPans, 0);
-            for(int i=0; i<2; i++){
-              copyStackOnto(bowls[i], newBowls[i]);
-              copyStackOnto(pan[i], newPans[i]);
+            executeHelper(recipe_count, recipes, recipes[i], newBowls, newPans);
+            copyStackOnto(bowls[0], newBowls[0]);
+            for(int i=0; i<20; i++){
+              //copyStackOnto(bowls[i], newBowls[i]);
+              //copyStackOnto(pan[i], newPans[i]);
               deleteStack(newBowls[i]);
               deleteStack(newPans[i]);
             }
@@ -131,13 +144,7 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
         break;
 
       case RETURN:
-        for(int i=0; i<curr->val; i++){
-          while(pan[i]->top){
-            struct Ingredient toPrint = pop(pan[i]);
-            if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
-            else printf("%ld", toPrint.count);
-          }
-        }
+        printPans(pan, curr->val);
         iptr = recipe.step_count;
         break;
 
@@ -149,13 +156,7 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
 
   printf("\n---\n");
 
-  for(int i=0; i<recipe.serves; i++){
-    while(pan[i]->top){
-      struct Ingredient toPrint = pop(pan[i]);
-      if(toPrint.state == LIQUID) printf("%c", (char) toPrint.count);
-      else printf("%ld", toPrint.count);
-    }
-  }
+  printPans(pan, recipe.serves);
 
   // Cleanup
   intDeleteStack(jumps);
@@ -165,11 +166,17 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
 void execute(int recipe_count, struct Recipe recipes[]){
   printf("---executing:---\n");
 
-  struct Stack *bowls[] = {createStack(), createStack()};
-  struct Stack *pan[] = {createStack(), createStack()};
+  struct Stack *bowls[20];
+  struct Stack *pan[20];
+  for(int i=0; i<20; i++){
+    bowls[i] = createStack();
+    pan[i] = createStack();
+  }
 
-  executeHelper(recipe_count, recipes, recipes[0], bowls, pan, 0);
+  executeHelper(recipe_count, recipes, recipes[0], bowls, pan);
 
-  for(int i=0; i<2; i++) deleteStack(bowls[i]);
-  for(int i=0; i<2; i++) deleteStack(pan[i]);
+  for(int i=0; i<20; i++){
+    deleteStack(bowls[i]);
+    deleteStack(pan[i]);
+  }
 }
