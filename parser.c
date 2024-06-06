@@ -24,7 +24,7 @@ char *readUntil(char *str, int n, char c, FILE *stream){
 
 // Like fgets, but removes the trailing newline
 char *fgets2(char *restrict s, int n, FILE *restrict stream){
-  fgets(s, n, stream);
+  if(!fgets(s, n, stream)) return NULL;
   s[strcspn(s, "\n")] = '\0';
   return s;
 }
@@ -59,13 +59,13 @@ struct CommandParse parses[PATTERN_COUNT] = {
   {DIVIDE, "Divide (?<ingredient>.+)( into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)?"},
   {GLYPH_MANY, "Liquefy contents of (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
   {GLYPH, "Liquefy (?<ingredient>.+)"},
-  {PUSHDOWN_CONST, "Stir( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? for (?<minutes>.+) minutes?.+"},
+  {PUSHDOWN_CONST, "Stir( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? for (?<minutes>.+) minutes?"},
   {PUSHDOWN, "Stir (?<ingredient>.+) into (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
   {RANDOMIZE, "Mix( (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl)? well"},
   {CLEAN, "Clean (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl"},
   {PRINT, "Pour contents of (the |(?<bowl>.+)(st|nd|rd|th) )?mixing bowl into (the |(?<dish>.+)(st|nd|rd|th) )?baking dish"},
   {SUBROUTINE, "Serve with (?<recipe>.+)"},
-  {RETURN, "Refrigerate( for (?<hours>.+) hours)?"},
+  {RETURN, "Refrigerate( for (?<hours>.+) hours?)?"},
   {END, "(.+) (the (?<ingredient>.+) )?until (?<verb>.+)"},
   {WHILE, "(?<verb>.+) the (?<ingredient>.+)"},
   {BREAK, "Set( aside)"}
@@ -212,8 +212,7 @@ struct Step strToStep(char names[][128], int ingred_count, char *str){
 }
 
 // Takes a filename and parses the file as a recipe
-struct Recipe parse(const char *fname, char names[][128]){
-  FILE *file = fopen(fname, "r");
+struct Recipe parse(FILE *file, char names[][128]){
   struct Recipe recipe;
   char line[256];
 
@@ -256,10 +255,11 @@ struct Recipe parse(const char *fname, char names[][128]){
   // Parse "serves" line
   sscanf(line, "Serves %d.", &recipe.serves);
 
-  // Work needed: parse subroutines
+  // skip all blank characters
+  while(isspace(c = fgetc(file)));
+  ungetc(c, file);
 
   cleanupParses();
-  fclose(file);
 
   return recipe;
 }
