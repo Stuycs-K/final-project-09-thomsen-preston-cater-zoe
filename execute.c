@@ -1,17 +1,25 @@
 #include <stdio.h>
+#include <string.h> // strcmp
 #include "types.h"
 #include "stack.h"
 #include "execute.h"
 
-void execute(struct Recipe recipe){
+void copyStackOnto(struct Stack *to, struct Stack *from){
+  struct Stack* tempStack = createStack();
+  for(struct StackNode *ptr = from->top; ptr; ptr = ptr->next){
+    push(tempStack, ptr->data);
+  }
+  for(struct StackNode *ptr = tempStack->top; ptr; ptr = ptr->next){
+    push(to, ptr->data);
+  }
+  while(tempStack->top) pop(tempStack);
+  deleteStack(tempStack);
+}
 
-  printf("---executing:---\n");
-
-  struct Stack *bowls[] = {createStack(), createStack()};
-  struct Stack *pan[] = {createStack(), createStack()};
+void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe recipe, struct Stack *bowls[], struct Stack *pan[], int firstStep){
   struct intStack *jumps = intCreateStack();
 
-  for(int iptr=0; iptr<recipe.step_count; iptr++){
+  for(int iptr=firstStep; iptr<recipe.step_count; iptr++){
     struct Step *curr = recipe.steps + iptr;
     struct Ingredient *ing = &(recipe.ingredients[curr->ingredient]);
     struct Stack *bowl = bowls[curr->bowl-1]; // doesn't break on bowl==-1 but
@@ -80,15 +88,7 @@ void execute(struct Recipe recipe){
         break;
 
       case PRINT:
-        struct Stack* tempStack = createStack();
-        for(struct StackNode *ptr = bowl->top; ptr; ptr = ptr->next){
-          push(tempStack, ptr->data);
-        }
-        for(struct StackNode *ptr = tempStack->top; ptr; ptr = ptr->next){
-          push(pan[curr->val-1], ptr->data);
-        }
-        while(tempStack->top) pop(tempStack);
-        deleteStack(tempStack);
+        copyStackOnto(pan[curr->val-1], bowl);
         break;
 
       case WHILE:
@@ -110,7 +110,24 @@ void execute(struct Recipe recipe){
         break;
 
       case SUBROUTINE:
-        printf("subroutining\n");
+        for(int i=0; i<recipe_count; i++){
+          if(!strcmp(recipes[i].title, curr->string)){
+            //printf("%s\n", curr->string);
+            struct Stack *newBowls[] = {createStack(), createStack()};
+            struct Stack *newPans[] = {createStack(), createStack()};
+            for(int i=0; i<2; i++){
+              copyStackOnto(newBowls[i], bowls[i]);
+              copyStackOnto(newPans[i], pan[i]);
+            }
+            executeHelper(recipe_count, recipes, recipes[i], newBowls, newPans, 0);
+            for(int i=0; i<2; i++){
+              copyStackOnto(bowls[i], newBowls[i]);
+              copyStackOnto(pan[i], newPans[i]);
+              deleteStack(newBowls[i]);
+              deleteStack(newPans[i]);
+            }
+          }
+        }
         break;
 
       case RETURN:
@@ -141,8 +158,18 @@ void execute(struct Recipe recipe){
   }
 
   // Cleanup
-  for(int i=0; i<2; i++) deleteStack(bowls[i]);
-  for(int i=0; i<2; i++) deleteStack(pan[i]);
   intDeleteStack(jumps);
 
+}
+
+void execute(int recipe_count, struct Recipe recipes[]){
+  printf("---executing:---\n");
+
+  struct Stack *bowls[] = {createStack(), createStack()};
+  struct Stack *pan[] = {createStack(), createStack()};
+
+  executeHelper(recipe_count, recipes, recipes[0], bowls, pan, 0);
+
+  for(int i=0; i<2; i++) deleteStack(bowls[i]);
+  for(int i=0; i<2; i++) deleteStack(pan[i]);
 }

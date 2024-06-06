@@ -18,12 +18,9 @@ int main(int argc, char *argv[]) {
     struct Recipe recipes[5];
     int recipe_count;
     FILE *file = fopen(filename, "r");
-    for(recipe_count = 0; !feof(file); recipe_count++) recipes[recipe_count] = parse(file, names);
-    fclose(file);
-    //struct Recipe recipe = recipes[0];
 
-    //Print Recipe details for debugging purposes
-    for(int j=0; j<recipe_count; j++){
+    for(int j = 0; !feof(file); j++){
+      recipes[recipe_count++] = parse(file, names);
       printf("\n=== %s ===\n", recipes[j].title);
       for(int i=0; i<recipes[j].ingred_count; i++){
           printIngredient(recipes[j].ingredients[i], names[i]);
@@ -35,8 +32,10 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    fclose(file);
+
     printf("\n");
-    execute(recipes[0]);
+    execute(recipe_count, recipes);
 
     printf("\n---\n\n");
 
