@@ -106,7 +106,12 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
           intPush(jumps, iptr);
         }
         else{
-          while(recipe.steps[iptr].command != END) iptr++;
+          int count = 1;
+          while(count){
+            iptr++;
+            if(recipe.steps[iptr].command == WHILE) count++;
+            if(recipe.steps[iptr].command == END) count--;
+          }
         }
         break;
 
@@ -116,7 +121,13 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
         break;
 
       case BREAK:
-        while(recipe.steps[iptr].command != END) iptr++;
+        intPop(jumps);
+        int count = 1;
+        while(count){
+          iptr++;
+          if(recipe.steps[iptr].command == WHILE) count++;
+          if(recipe.steps[iptr].command == END) count--;
+        }
         break;
 
       case SUBROUTINE:
