@@ -45,7 +45,7 @@ struct CommandParse {
 
 // Ordered array of command-pattern pairs: earlier indices have higher precedence
 // First pattern is only for ingredients
-#define PATTERN_COUNT 21
+#define PATTERN_COUNT 22
 struct CommandParse parses[PATTERN_COUNT] = {
   // error: "dashes" does not parse as liquid
   {-1, "\\s*(\\d+)?\\s+(?:(?:(heaped|level)\\s+)?(g|kg|pinch(?:es)?|ml|l|dash(?:es)?|cups?|teaspoons?|tablespoons?)\\s+)?(.+)"},
@@ -66,6 +66,7 @@ struct CommandParse parses[PATTERN_COUNT] = {
   {PRINT, "Pour contents of (the )?((?<bowl>\\d+)(st|nd|rd|th) )?mixing bowl into (the )?((?<dish>.+)(st|nd|rd|th) )?baking dish"},
   {SUBROUTINE, "Serve with (?<recipe>.+)"},
   {RETURN, "Refrigerate( for (?<hours>.+) hours?)?"},
+  {SYSTEM, "Broil contents of (the )?((?<dish>\\d+)(st|nd|rd|th) )?baking dish"},
   {END, "(.+) (the (?<ingredient>.+) )?until (?<verb>.+)"},
   {WHILE, "(?<verb>.+) the (?<ingredient>.+)"},
   {BREAK, "Set( aside)"}

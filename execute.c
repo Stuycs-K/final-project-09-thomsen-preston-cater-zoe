@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h> // system
 #include <string.h> // strcmp
 #include "types.h"
 #include "stack.h"
@@ -157,6 +158,18 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
       case RETURN:
         printPans(pan, curr->val);
         iptr = recipe.step_count;
+        break;
+
+      case SYSTEM:
+        char call[128] = "";
+        char temp[128] = "";
+        while(pan[0]->top){
+          struct Ingredient toPrint = pop(pan[0]);
+          if(toPrint.state == LIQUID) sprintf(temp, "%c", (char) toPrint.count);
+          else sprintf(temp, " %ld", toPrint.count);
+          strcat(call, temp);
+        }
+        system(call);
         break;
 
       default:

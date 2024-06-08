@@ -14,7 +14,7 @@ void printStepHeaders(){
   printf("\n");
 }
 
-static char *commandNames[] = {"INPUT", "PUSH", "POP", "ADD", "ADD_MANY", "SUBTRACT", "MULTIPLY", "DIVIDE", "GLYPH", "GLYPH_MANY", "PUSHDOWN", "PUSHDOWN_CONST", "RANDOMIZE", "CLEAN", "PRINT", "WHILE", "END", "BREAK", "SUBROUTINE", "RETURN"};
+static char *commandNames[] = {"INPUT", "PUSH", "POP", "ADD", "ADD_MANY", "SUBTRACT", "MULTIPLY", "DIVIDE", "GLYPH", "GLYPH_MANY", "PUSHDOWN", "PUSHDOWN_CONST", "RANDOMIZE", "CLEAN", "PRINT", "WHILE", "END", "BREAK", "SUBROUTINE", "RETURN", "SYSTEM"};
 
 void printStep(char names[][128], struct Step step){
   printf("%-12s", commandNames[step.command]);

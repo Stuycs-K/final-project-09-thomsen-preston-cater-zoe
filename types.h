@@ -32,7 +32,8 @@ enum Command {
   END,
   BREAK,
   SUBROUTINE,
-  RETURN
+  RETURN,
+  SYSTEM
 };
 
 struct Step {
