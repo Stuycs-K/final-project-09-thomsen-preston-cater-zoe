@@ -11,7 +11,14 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
 
     //We will have status changes come after the file which is being modified so that it is easier to incorporate new things as we get to it
+    if(argc<2){
+      fprintf(stderr, "No input file provided.\n");
+      exit(1);
+    }
     char *filename = argv[1];
+
+    int verbose = 0;
+    if(argc >= 3 && !strcmp(argv[2], "-v")) verbose = 1;
 
     // Parse file as Recipe
     char names[64][128];
@@ -21,23 +28,25 @@ int main(int argc, char *argv[]) {
 
     for(int j = 0; !feof(file); j++){
       recipes[recipe_count++] = parse(file, names);
-      printf("\n=== %s (serves %d) ===\n", recipes[j].title, recipes[j].serves);
-      for(int i=0; i<recipes[j].ingred_count; i++){
-          printIngredient(recipes[j].ingredients[i], names[i]);
-      }
-      printf("\n");
-      printStepHeaders();
-      for(int i=0; i<recipes[j].step_count; i++){
-          printStep(names, recipes[j].steps[i]);
+      if(verbose){
+        printf("\n=== %s (serves %d) ===\n", recipes[j].title, recipes[j].serves);
+        for(int i=0; i<recipes[j].ingred_count; i++){
+            printIngredient(recipes[j].ingredients[i], names[i]);
+        }
+        printf("\n");
+        printStepHeaders();
+        for(int i=0; i<recipes[j].step_count; i++){
+            printStep(names, recipes[j].steps[i]);
+        }
       }
     }
 
     fclose(file);
 
-    printf("\n");
+    if(verbose) printf("\n---executing:---\n");
     execute(recipe_count, recipes);
 
-    printf("\n---\n\n");
+    printf("\n");
 
     // Testing stack implementation
     // struct Stack* tester = createStack();

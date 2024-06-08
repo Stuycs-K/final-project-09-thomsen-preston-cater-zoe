@@ -178,8 +178,6 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
     }
   }
 
-  printf("\n---\n");
-
   printPans(pan, recipe.serves);
 
   // Cleanup
@@ -188,8 +186,6 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
 }
 
 void execute(int recipe_count, struct Recipe recipes[]){
-  printf("---executing:---\n");
-
   struct Stack *bowls[20];
   struct Stack *pan[20];
   for(int i=0; i<20; i++){
