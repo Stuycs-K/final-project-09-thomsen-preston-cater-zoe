@@ -169,6 +169,7 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
           else sprintf(temp, " %ld", toPrint.count);
           strcat(call, temp);
         }
+        //printf("%s\n", call);
         system(call);
         break;
 
