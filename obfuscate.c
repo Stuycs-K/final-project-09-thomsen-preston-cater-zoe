@@ -1,21 +1,25 @@
 #include <stdio.h> // printf, fgets
 #include <string.h> // strlen, strcmp
 #include <stdlib.h> // exit
+#include <ctype.h> // isascii
 #include "obfuscate.h"
 
 #define PRINT 0
 #define EXECUTE 1
 
+void error(const char *msg){
+  fprintf(stderr, "%s\n", msg);
+  exit(1);
+}
+
 int assignChars(char *input){
   int count = 0;
   for(char *i = input; *i; i++){
+    if(!isascii(*i)) error("Non-ASCII character used -- invalid input. Please limit the input to only ASCII characters.");
     char *j = input;
     while(*i != *j) j++; // find spot where both have same value
     if(i==j) ings[count++].c = *i; // compare addresses not values
-    if(count == 100){
-      fprintf(stderr, "More than 100 distinct characters used -- too many. Please use fewer distinct characters.\n");
-      exit(1);
-    }
+    if(count == 100) error("More than 100 distinct characters used -- too many. Please use fewer distinct characters.");
   }
   return count;
 }
@@ -24,10 +28,8 @@ int main(int argc, char *argv[]){
   int command;
   if(argc == 3 && !strcmp(argv[1], "-p")) command = PRINT;
   else if(argc == 3 && !strcmp(argv[1], "-x")) command = EXECUTE;
-  else{
-    fprintf(stderr, "Incorrect usage. Provide either the flag -p (to print) or -x (to execute) followed by a string to encode.\n");
-    exit(1);
-  }
+  else error("Incorrect usage. Provide either the flag -p (to print) or -x (to execute) followed by a string to encode.");
+
   char *input = argv[2];
   int count = assignChars(input);
 
