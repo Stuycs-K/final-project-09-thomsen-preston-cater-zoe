@@ -19,7 +19,7 @@ int assignChars(char *input){
     char *j = input;
     while(*i != *j) j++; // find spot where both have same value
     if(i==j) ings[count++].c = *i; // compare addresses not values
-    if(count == 100) error("More than 100 distinct characters used -- too many. Please use fewer distinct characters.");
+    if(count == 256) error("More than 256 distinct characters used -- too many. Please use fewer distinct characters.");
   }
   return count;
 }
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
   
   printf("\nIngredients.\n");
   for(int i = 0; i < count; i++)
-    printf("%d %s%s\n", (int) ings[i].c, ings[i].measure, ings[i].name);
+    printf("%d %ss %s\n", (int) ings[i].c, ings[i].measure, ings[i].name);
   
   printf("\nMethod.\n");
   for(int i = strlen(input)-1; i >= 0; i--){
