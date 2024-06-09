@@ -1,11 +1,16 @@
 .PHONY: run compile clean
 ARGS=recipes/opposition.chef
 
-run: main
-	./main $(ARGS)
+run: interpret
+	./interpret $(ARGS)
 
-compile main: main.o parser.o types.o execute.o stack.o
-	gcc -Wall -Werror -fsanitize=address,undefined -o main main.o parser.o types.o execute.o stack.o -lpcre2-8 
+compile: interpret obfuscate
+
+interpret: main.o parser.o types.o execute.o stack.o
+	gcc -Wall -Werror -fsanitize=address,undefined -o interpret main.o parser.o types.o execute.o stack.o -lpcre2-8 
+
+obfuscate: obfuscate.o
+	gcc -Wall -Werror -fsanitize=address,undefined -o obfuscate obfuscate.o
 
 main.o: main.c parser.c parser.h types.c types.h execute.c execute.h stack.c stack.h
 	gcc -c main.c
@@ -22,5 +27,8 @@ execute.o: execute.c execute.h types.c types.h stack.c stack.h
 stack.o: stack.c stack.h types.c types.h
 	gcc -c stack.c
 
+obfuscate.o: obfuscate.c obfuscate.h
+	gcc -c obfuscate.c
+
 clean:
-	rm -f main *.o
+	rm -f interpret *.o
