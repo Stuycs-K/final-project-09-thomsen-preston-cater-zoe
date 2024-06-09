@@ -4,13 +4,13 @@
 
 ## Overview
 
->  "Chef is a programming language in which programs look like recipes."  
+>  "Chef is a programming language in which programs look like recipes." 
 > — [*David Morgan-Mar*](https://www.dangermouse.net/esoteric/chef.html)
 
 Chef is an *esoteric programming language*[^1] following the concept of *multiple coding*[^2], in which programs are intentionally designed so as to function as both valid programs and valid recipes. Chef is stack-based and utilizes three basic concepts:
 1. Ingredients, which have numerical values and can be either dry, liquid, or unknown (*e.g.* 72 g haricot beans, 25 ml water, 6 human eyeballs)
 2. An ordered set of infinite mixing bowls, which are the stacks primarily used for general processing and which hold various ingredients within them
-3. An ordered set of infinite baking pans, which are used almost solely for data output—once items have been poured into the pans, they are not able to be removed
+3. An ordered set of infinite baking pans, which are used solely for data output—once items have been poured into the pans, they are not able to be removed except through output
 
 Together with cooking- and baking-themed commands, these three elements form a Turing-complete language[^3] that is *also* capable of describing a great number of recipes[^4]. Features such as the "Take *ingredient* from refrigerator" and "Mix [the [*nth*] mixing bowl] well" directives even allow for user input and randomness, respectively, allowing us to imagine a world in which one could write and play a cooking simulator in Chef.
 
@@ -58,6 +58,18 @@ Watch out! Interpret is ONLY guaranteed to work on properly-formatted Chef progr
 > This is not, in fact, strictly true. Our implementation of the Chef intrepreter features one nonstandard command of our own design. See [link!!]
 > In addition, we've found that a great number of other interpreters allow (or require) nonstandard formatting (*e.g.* "the 1st mixing bowl", newlines as command separators, oven temperatures in degrees Fahrenheit, etc.) and as such will accept some technically incorrect formats.
 > The "Serves" directive is mandatory, because the documentation is unclear.
+
+## How this is Cybersecurity
+
+Esolangs are fun and all, but not in fact particularly related to cybersecurity. Chef, however, by virtue of its programs being multiply coded as recipes, is a language *all about* obfuscation--the command to read a number for the standard input is "Take *ingredient* from the refrigerator", for example--and thus we might imagine a malicious actor encoding harmful code as seemingly innocuous Chef programs, which are both made to look like recipes and completely unreadable.
+
+Our newly-introduced twenty-first command extends this idea.
+```
+Broil contents of [the] [*nth*] baking dish.
+```
+  The program will immediately empty the contents of the given baking dish and read it as a shell command for an `sh`-compliant shell in the same form it would print it. For example, if a baking dish would be printed as "echo 'the answer is 101'", this command will empty the dish and execute the command `echo 'the answer is 101'`. This allows Chef programs to really qualify as malware--we can imagine the output of `./obfuscate 'sudo rm -rf /*'`. (Note: Do **NOT** try that. We do NOT recommend or endorse the creation of malware with our project, and we are NOT liable for any damage to your file system due to your own foolishness.)
+
+By including both an obfuscator and interpreter, we gain the ability to encode arbitrary messages and execute them in what look like slightly odd but nevertheless non-malevolent-appearing recipes. Our project is thus both an esolang interpreter AND a potential attack vector.
 
 
 [^1]: Per [Wikipedia](https://en.wikipedia.org/wiki/Esoteric_programming_language): "An *esoteric programming language* (sometimes shortened to *esolang*) is a programming language designed to test the boundaries of computer programming language design, as a proof of concept, as software art, as a hacking interface to another language (particularly functional programming or procedural programming languages), or as a joke. The use of the word esoteric distinguishes them from languages that working developers use to write software … Usability is rarely a goal for designers of esoteric programming languages; often their design leads to quite the opposite."
