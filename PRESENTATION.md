@@ -1,10 +1,12 @@
 # The Caterers (Presentation)
 
+Video found [here](https://drive.google.com/file/d/13m5r6mSRCnoAiT4AbzqvMGTcFNCCxnQH/view?usp=sharing)
+
 ### P Thomsen & Z Cater  (Period 09)
 
 ## Overview
 
->  "Chef is a programming language in which programs look like recipes." 
+>  "Chef is a programming language in which programs look like recipes."
 > — [*David Morgan-Mar*](https://www.dangermouse.net/esoteric/chef.html)
 
 Chef is an *esoteric programming language*[^1] following the concept of *multiple coding*[^2], in which programs are intentionally designed so as to function as both valid programs and valid recipes. Chef is stack-based and utilizes three basic concepts:
@@ -48,7 +50,6 @@ Interpret takes a file path followed by an optional flag and attempts to run it 
 
 Sample usage:
 - `./interpret recipes/factorial.chef`
-- `./interpret download.txt -v`
 - `cat recipes/souffle.chef | ./interpret -`
 - `./obfuscate -p 'wow' | ./interpret - -v`
 
