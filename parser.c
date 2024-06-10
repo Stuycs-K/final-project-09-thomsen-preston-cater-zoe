@@ -150,6 +150,11 @@ struct Step strToStep(char **names, int ingred_count, char *str){
     // Ingredient: find index of ingredient in ingredient list and save
     if(!strcmp("ingredient", tabptr + 2)){
       for(int i=0; i<ingred_count; i++) if(!strcmp(names[i], curr)) step.ingredient = i;
+      if(step.ingredient == -1 && step.command != END){
+        char buffer[256];
+        snprintf(buffer, sizeof(buffer), "Invalid ingredient name: %s", curr);
+        error(buffer);
+      }
     }
     // Bowl: parse number, otherwise default to 1
     else if(!strcmp("bowl", tabptr + 2)){
