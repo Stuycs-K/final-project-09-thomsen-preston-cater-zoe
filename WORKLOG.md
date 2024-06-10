@@ -36,6 +36,32 @@
 - Continued working on code execution and removing magic numbers
 - Implemented pushdown, looping, breaking, and early returns
 
+### 2024-06-03
+- Minor bugfixes
+
+### 2024-06-05
+- Added subroutine parsing (was awful)
+
+### 2024-06-06
+- Added subrouting execution
+
+### 2024-06-07
+- Minor bugfixes
+- Added 'Broil' command, which is of our own design
+- Implemented verbosity controls and improved the reverse shell code
+
+### 2024-06-09
+- Converted code obfuscator from Haskell (and sitting on a separate computer) to C (and part of our project)
+- Split project into two parts: obfuscate and interpret
+- Improved obfuscation capabilities
+- Wrote documentation for both halves
+- No upper limit on number of possible steps or ingredients anymore
+- Improved error handling
+
+### 2024-06-10
+- Recorded video
+- No upper limit on number of subroutines in a file
+
 ## Preston Thomsen
 
 ### 5/22/2024
