@@ -51,7 +51,6 @@
 
 - Implemented the unique commands for stacks that chef utilizes (Randomizing the stack and pushNSpacesDown)
 
-
 ### 5/26/2024
 
 - Worked on debugging the many issues with the stack functions I implemented
@@ -70,4 +69,25 @@
 
 ### 5/31/2024
 
-- 
+- Began to work on the script for the video (basic distribution of talking points and important notes to touch on)
+
+### 6/3/2024
+
+- Fixed newly found bugs with nodes which Zoe informed me of
+
+### 6/4/2024
+
+- Decided on how I will do randomization of stacks and interfaced with Zoe (Helped her with minor debugging)
+
+### 6/6/2024
+
+- Worked on debugging my code because somehow the randomization did not work
+
+### 6/7/2024
+
+- FINALLY FIXED RANDOMIZATION (with like two words of advice from Zoe)
+- Finished up the script for the presentation
+
+### 6/9-10/2024
+
+- Did the presentation with Zoe!
