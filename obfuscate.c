@@ -1,16 +1,11 @@
-#include <stdio.h> // printf, fgets
+#include <stdio.h> // printf
 #include <string.h> // strlen, strcmp
-#include <stdlib.h> // exit
 #include <ctype.h> // isascii
+#include "utils.h" // error
 #include "obfuscate.h"
 
 #define PRINT 0
 #define EXECUTE 1
-
-void error(const char *msg){
-  fprintf(stderr, "%s\n", msg);
-  exit(1);
-}
 
 int assignChars(char *input){
   int count = 0;

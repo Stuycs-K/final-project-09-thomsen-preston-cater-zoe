@@ -5,16 +5,14 @@
 #include "parser.h" // Recipe, printIngredient, parse
 #include "stack.h"
 #include "execute.h"
+#include "utils.h"
 
 int main(int argc, char *argv[]) {
 
     srand(time(NULL));
 
     //We will have status changes come after the file which is being modified so that it is easier to incorporate new things as we get to it
-    if(argc<2 || argc==3 && strcmp(argv[2], "-v") || argc>=4){
-      fprintf(stderr, "Invalid arguments. A file path to read from or a - indicating data from the standard input is required, and an optional -v (verbose) flag may follow.\n");
-      exit(1);
-    }
+    if(argc<2 || argc==3 && strcmp(argv[2], "-v") || argc>=4) error("Invalid arguments. A file path to read from or a - indicating data from the standard input is required, and an optional -v (verbose) flag may follow.");
 
     char *filename = argv[1];
     int verbose = argc == 3 && !strcmp(argv[2], "-v") ? 1 : 0;
@@ -24,10 +22,7 @@ int main(int argc, char *argv[]) {
     struct Recipe recipes[5];
     int recipe_count = 0;
     FILE *file = !strcmp(filename, "-") ? stdin : fopen(filename, "r");
-    if(!file){
-      fprintf(stderr, "Error opening file.\n");
-      exit(1);
-    }
+    if(!file) error("Error opening file.");
 
     for(int j = 0; !feof(file); j++){
       names = malloc(sizeof(char*) * 64);

@@ -6,16 +6,16 @@ run: interpret
 
 compile: interpret obfuscate
 
-interpret: main.o parser.o types.o execute.o stack.o
-	gcc -Wall -Werror -fsanitize=address,undefined -o interpret main.o parser.o types.o execute.o stack.o -lpcre2-8 
+interpret: main.o parser.o types.o execute.o stack.o utils.o
+	gcc -Wall -Werror -fsanitize=address,undefined -o interpret main.o parser.o types.o execute.o stack.o utils.o -lpcre2-8 
 
-obfuscate: obfuscate.o
-	gcc -Wall -Werror -fsanitize=address,undefined -o obfuscate obfuscate.o
+obfuscate: obfuscate.o utils.o
+	gcc -Wall -Werror -fsanitize=address,undefined -o obfuscate obfuscate.o utils.o
 
-main.o: main.c parser.c parser.h types.c types.h execute.c execute.h stack.c stack.h
+main.o: main.c parser.c parser.h types.c types.h execute.c execute.h stack.c stack.h utils.c utils.h
 	gcc -c main.c
 
-parser.o: parser.c parser.h types.c types.h
+parser.o: parser.c parser.h types.c types.h utils.c utils.h
 	gcc -c parser.c
 
 types.o: types.c types.h
@@ -27,8 +27,11 @@ execute.o: execute.c execute.h types.c types.h stack.c stack.h
 stack.o: stack.c stack.h types.c types.h
 	gcc -c stack.c
 
-obfuscate.o: obfuscate.c obfuscate.h
+obfuscate.o: obfuscate.c obfuscate.h utils.c utils.h
 	gcc -c obfuscate.c
+
+utils.o: utils.c utils.h
+	gcc -c utils.c
 
 clean:
 	rm -f interpret *.o

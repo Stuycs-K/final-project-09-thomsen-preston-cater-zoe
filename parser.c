@@ -1,39 +1,12 @@
 #include <stdio.h>  // FILE, fgets, fopen, fclose
 #include <stdlib.h> // strol
 #include <string.h> // strncmp, strlen, strcpy, strcspn
-#include <ctype.h>  // isspace
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
+#include <ctype.h>  // isspace
 #include "types.h" // Ingredient, Recipe, 128
+#include "utils.h" // hasPrefix, readUntil, fgets2, trimSpaces
 #include "parser.h"
-
-// --- Utility functions
-
-// Checks if a string begins with a given prefix
-int hasPrefix(const char *str, const char *pre){
-  return strncmp(pre, str, strlen(pre)) == 0;
-}
-
-// Like fgets, but reads until a character is found
-char *readUntil(char *str, int n, char c, FILE *stream){
-  char *curr = str;
-  while (n-- > 0 && (*curr = getc(stream)) != c && *curr != EOF) curr++;
-  *curr = '\0';
-  return str;
-}
-
-// Like fgets, but removes the trailing newline
-char *fgets2(char *restrict s, int n, FILE *restrict stream){
-  if(!fgets(s, n, stream)) return NULL;
-  s[strcspn(s, "\n")] = '\0';
-  return s;
-}
-
-// Remove spaces from the start of a string
-char *trimSpaces(char *curr){
-  while(curr && isspace(*curr)) curr++;
-  return curr;
-}
 
 // Helper struct to store commands and their associated patterns
 struct CommandParse {
@@ -79,9 +52,9 @@ void setupParses(){
     uint32_t options = i ? PCRE2_UNGREEDY : 0;
     parses[i].regex = pcre2_compile((PCRE2_SPTR) parses[i].pattern, PCRE2_ZERO_TERMINATED, options, &errornumber, &erroroffset, NULL);
     if(parses[i].regex == NULL){
-      PCRE2_UCHAR buffer[256];
-      pcre2_get_error_message(errornumber, buffer, sizeof(buffer));
-      printf("PCRE2 compilation failed at offset %d: %s\n", (int)erroroffset, buffer);
+      PCRE2_UCHAR buffer[256] = "PCRE2 compilation failed: ";
+      pcre2_get_error_message(errornumber, buffer + strlen(buffer), sizeof(buffer) - strlen(buffer));
+      error(buffer);
     }
     parses[i].matches = pcre2_match_data_create_from_pattern(parses[i].regex, NULL);
   }
@@ -102,7 +75,7 @@ struct Ingredient strToIng(char *str, char **name){
   struct Ingredient ing;
   
   int rc = pcre2_match(parses[0].regex, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, parses[0].matches, NULL);
-  if (rc < 0) printf("match error");
+  if (rc < 0) error("match error");
   PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(parses[0].matches);
 
   char *field[5];
@@ -153,8 +126,7 @@ struct Step strToStep(char **names, int ingred_count, char *str){
     rc = pcre2_match(parses[matched].regex, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, parses[matched].matches, NULL);
     if(rc > 0) break;
   }
-  // Really should throw an error here (malformed command)
-  if(rc < 0) printf("No match found.");
+  if(rc < 0) error("No match found.");
 
   // Store previously-calculated matches and associated command name
   step.command = parses[matched].command;
@@ -255,7 +227,6 @@ struct Recipe parse(FILE *file, char **names){
     readUntil(line, 256, '.', file);
     // parse line
     recipe.steps[recipe.step_count++] = strToStep(names, recipe.ingred_count, line);
-    //if(recipe.steps[recipe.step_count-1].ingredient != -1) printf("%s\n", names[recipe.steps[recipe.step_count-1].ingredient]);
     if(recipe.step_count >= recipe.max_steps){
       recipe.max_steps += 64;
       recipe.steps = realloc(recipe.steps, sizeof(struct Step) * recipe.max_steps);
