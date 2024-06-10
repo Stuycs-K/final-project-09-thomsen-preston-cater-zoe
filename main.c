@@ -20,9 +20,9 @@ int main(int argc, char *argv[]) {
     int verbose = argc == 3 && !strcmp(argv[2], "-v") ? 1 : 0;
 
     // Parse file as Recipe
-    char names[64][128];
+    char **names;
     struct Recipe recipes[5];
-    int recipe_count;
+    int recipe_count = 0;
     FILE *file = !strcmp(filename, "-") ? stdin : fopen(filename, "r");
     if(!file){
       fprintf(stderr, "Error opening file.\n");
@@ -30,11 +30,12 @@ int main(int argc, char *argv[]) {
     }
 
     for(int j = 0; !feof(file); j++){
+      names = malloc(sizeof(char*) * 64);
       recipes[recipe_count++] = parse(file, names);
       if(verbose){
         printf("\n=== %s (serves %d) ===\n", recipes[j].title, recipes[j].serves);
         for(int i=0; i<recipes[j].ingred_count; i++){
-            printIngredient(recipes[j].ingredients[i], names[i]);
+          printIngredient(recipes[j].ingredients[i], names[i]);
         }
         printf("\n");
         printStepHeaders();
@@ -42,6 +43,8 @@ int main(int argc, char *argv[]) {
             printStep(names, recipes[j].steps[i]);
         }
       }
+      for(int i=0; i<recipes[j].ingred_count; i++) free(names[i]);
+    free(names);
     }
 
     if(strcmp(filename, "-")) fclose(file);

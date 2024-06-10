@@ -57,6 +57,6 @@ struct Recipe {
 
 void printIngredient(struct Ingredient ing, char *name);
 void printStepHeaders();
-void printStep(char names[][128], struct Step step);
+void printStep(char **names, struct Step step);
 
 #endif // TYPES_H

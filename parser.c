@@ -98,7 +98,7 @@ void cleanupParses(){
 // -- Ingredient parsing functions
 
 // Read a single-line ingredient string as an Ingredient
-struct Ingredient strToIng(char *str, char name[128]){
+struct Ingredient strToIng(char *str, char **name){
   struct Ingredient ing;
   
   int rc = pcre2_match(parses[0].regex, str, strlen(str), 0, PCRE2_ANCHORED | PCRE2_ENDANCHORED, parses[0].matches, NULL);
@@ -127,7 +127,7 @@ struct Ingredient strToIng(char *str, char name[128]){
   }
 
   // The name of an ingredient
-  strcpy(name, field[4]);
+  *name = strdup(field[4]);
 
   return ing;
 }
@@ -135,7 +135,7 @@ struct Ingredient strToIng(char *str, char name[128]){
 // --- Step parsing functions
 
 // Read a single string as a step
-struct Step strToStep(char names[][128], int ingred_count, char *str){
+struct Step strToStep(char **names, int ingred_count, char *str){
   // Default values
   struct Step step = {
     .command = -1,
@@ -212,7 +212,7 @@ struct Step strToStep(char names[][128], int ingred_count, char *str){
 }
 
 // Takes a filename and parses the file as a recipe
-struct Recipe parse(FILE *file, char names[][128]){
+struct Recipe parse(FILE *file, char **names){
   struct Recipe recipe;
   char line[256];
 
@@ -232,7 +232,7 @@ struct Recipe parse(FILE *file, char names[][128]){
   recipe.ingredients = malloc(sizeof(struct Ingredient) * 64);
   //names = malloc(128 * 64);
   while(strcmp(fgets2(line, 256, file), "")){
-    recipe.ingredients[recipe.ingred_count] = strToIng(line, names[recipe.ingred_count]);
+    recipe.ingredients[recipe.ingred_count] = strToIng(line, &(names[recipe.ingred_count]));
     recipe.ingred_count++;
     if(recipe.ingred_count >= recipe.max_ingreds){
       recipe.max_ingreds += 64;
@@ -255,6 +255,7 @@ struct Recipe parse(FILE *file, char names[][128]){
     readUntil(line, 256, '.', file);
     // parse line
     recipe.steps[recipe.step_count++] = strToStep(names, recipe.ingred_count, line);
+    //if(recipe.steps[recipe.step_count-1].ingredient != -1) printf("%s\n", names[recipe.steps[recipe.step_count-1].ingredient]);
     if(recipe.step_count >= recipe.max_steps){
       recipe.max_steps += 64;
       recipe.steps = realloc(recipe.steps, sizeof(struct Step) * recipe.max_steps);
