@@ -49,6 +49,12 @@ int main(int argc, char *argv[]) {
     if(verbose) printf("\n---executing:---\n");
     execute(recipe_count, recipes);
 
+
+    for(int i=0; i<recipe_count; i++){
+      free(recipes[i].ingredients);
+      free(recipes[i].steps);
+    }
+
     printf("\n");
 
     // Testing stack implementation

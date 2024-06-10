@@ -161,16 +161,22 @@ void executeHelper(int recipe_count, struct Recipe recipes[], struct Recipe reci
         break;
 
       case SYSTEM:
-        char call[128] = "";
-        char temp[128] = "";
+        int call_space = 64;
+        char *call = malloc(call_space);
+        char temp[64] = "";
         while(pan[0]->top){
           struct Ingredient toPrint = pop(pan[0]);
           if(toPrint.state == LIQUID) sprintf(temp, "%c", (char) toPrint.count);
           else sprintf(temp, " %ld", toPrint.count);
+          if(strlen(call) + strlen(temp) >= call_space){
+            call_space += 64;
+            call = realloc(call, call_space);
+          }
           strcat(call, temp);
         }
         //printf("%s\n", call);
         system(call);
+        free(call);
         break;
 
       default:

@@ -47,8 +47,7 @@ struct CommandParse {
 // First pattern is only for ingredients
 #define PATTERN_COUNT 22
 struct CommandParse parses[PATTERN_COUNT] = {
-  // error: "dashes" does not parse as liquid
-  {-1, "\\s*(\\d+)?\\s+(?:(?:(heaped|level)\\s+)?(g|kg|pinch(?:es)?|ml|l|dash(?:es)?|cups?|teaspoons?|tablespoons?)\\s+)?(.+)"},
+  {-1, "\\s*(\\d+)?\\s+(?:(?:(heaped|level)\\s+)?(g|kg|pinch|ml|l|dash|cup|teaspoon|tablespoon)(?:e?s)?\\s+)?(.+)"},
   {INPUT, "Take (?<ingredient>.+) from (the )?refrigerator"},
   {PUSH, "Put (?<ingredient>.+) into (the )?((?<bowl>\\d+)(st|nd|rd|th) )?mixing bowl"},
   {POP, "Fold (?<ingredient>.+) into (the )?((?<bowl>\\d+)(st|nd|rd|th) )?mixing bowl"},
@@ -137,7 +136,6 @@ struct Ingredient strToIng(char *str, char name[128]){
 
 // Read a single string as a step
 struct Step strToStep(char names[][128], int ingred_count, char *str){
-  //printf("%s\n", str);
   // Default values
   struct Step step = {
     .command = -1,
@@ -230,9 +228,17 @@ struct Recipe parse(FILE *file, char names[][128]){
 
   // Read ingredients one line at a time until the next blank line
   recipe.ingred_count = 0;
+  recipe.max_ingreds = 64;
+  recipe.ingredients = malloc(sizeof(struct Ingredient) * 64);
+  //names = malloc(128 * 64);
   while(strcmp(fgets2(line, 256, file), "")){
     recipe.ingredients[recipe.ingred_count] = strToIng(line, names[recipe.ingred_count]);
     recipe.ingred_count++;
+    if(recipe.ingred_count >= recipe.max_ingreds){
+      recipe.max_ingreds += 64;
+      recipe.ingredients = realloc(recipe.ingredients, sizeof(struct Ingredient) * recipe.max_ingreds);
+      //names = realloc(recipe.ingredients, 128 * recipe.max_ingreds);
+    }
   }
 
   // Skip everything after the ingredients and before the method
@@ -240,6 +246,8 @@ struct Recipe parse(FILE *file, char names[][128]){
 
   // Read method one sentence at a time
   recipe.step_count = 0;
+  recipe.max_steps = 64;
+  recipe.steps = malloc(sizeof(struct Step) * 64);
   char c;
   // read until whitespace followed by newline peeked
   while('\n' != ungetc(getc(file), file)){
@@ -247,6 +255,10 @@ struct Recipe parse(FILE *file, char names[][128]){
     readUntil(line, 256, '.', file);
     // parse line
     recipe.steps[recipe.step_count++] = strToStep(names, recipe.ingred_count, line);
+    if(recipe.step_count >= recipe.max_steps){
+      recipe.max_steps += 64;
+      recipe.steps = realloc(recipe.steps, sizeof(struct Step) * recipe.max_steps);
+    }
     // delete next character if it's a space or newline
     if(!isspace(c = getc(file))) ungetc(c, file);
   }

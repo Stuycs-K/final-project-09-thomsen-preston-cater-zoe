@@ -47,9 +47,11 @@ struct Step {
 struct Recipe {
   char title[128];
   int ingred_count;
-  struct Ingredient ingredients[64];
+  int max_ingreds;
+  struct Ingredient *ingredients;
   int step_count;
-  struct Step steps[128];
+  int max_steps;
+  struct Step *steps;
   int serves;
 };
 

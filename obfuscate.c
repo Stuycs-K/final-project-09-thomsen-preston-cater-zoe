@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
   
   printf("\nIngredients.\n");
   for(int i = 0; i < count; i++)
-    printf("%d %ss %s\n", (int) ings[i].c, ings[i].measure, ings[i].name);
+    printf("%d %s%s%s\n", (int) ings[i].c, ings[i].measure, ings[i].measure == "" ? "" : "s ", ings[i].name);
   
   printf("\nMethod.\n");
   for(int i = strlen(input)-1; i >= 0; i--){
