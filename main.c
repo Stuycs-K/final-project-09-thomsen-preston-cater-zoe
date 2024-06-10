@@ -19,13 +19,14 @@ int main(int argc, char *argv[]) {
 
     // Parse file as Recipe
     char **names;
-    struct Recipe recipes[5];
+    struct Recipe *recipes = malloc(0);
     int recipe_count = 0;
     FILE *file = !strcmp(filename, "-") ? stdin : fopen(filename, "r");
     if(!file) error("Error opening file.");
 
     for(int j = 0; !feof(file); j++){
       names = malloc(sizeof(char*) * 64);
+      recipes = realloc(recipes, sizeof(struct Recipe) * (recipe_count+1));
       recipes[recipe_count++] = parse(file, names);
       if(verbose){
         printf("\n=== %s (serves %d) ===\n", recipes[j].title, recipes[j].serves);
@@ -48,10 +49,11 @@ int main(int argc, char *argv[]) {
     execute(recipe_count, recipes);
 
 
+    free(recipes[0].ingredients); // i DO NOT understand
     for(int i=0; i<recipe_count; i++){
-      free(recipes[i].ingredients);
       free(recipes[i].steps);
     }
+    free(recipes);
 
     printf("\n");
 
